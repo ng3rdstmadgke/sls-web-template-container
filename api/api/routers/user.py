@@ -9,7 +9,6 @@ from ..models.user import User
 from ..schemas.user import UserSchema, UserCreateSchema, UserUpdateSchema
 from ..cruds import (
     user as crud_user,
-    role as crud_role,
 ) 
 
 router = APIRouter()
@@ -87,29 +86,3 @@ def delete_user(
         raise HTTPException(status_code=404, detail="User not found")
     crud_user.delete_user(db, user)
     return {"user_id": user_id}
-
-@router.post("/users/{user_id}/roles/{role_id}", response_model=UserSchema)
-def associate_user_role(
-    user_id: int,
-    role_id: int,
-    db: Session = Depends(db.get_db),
-    _: User = Depends(auth.get_current_admin_user)
-):
-    """userとroleを関連付ける
-
-    Args:
-        user_id (int): roleを関連付けるユーザーのid
-        role_id (int): userに関連付けるロールのid
-        db (Session, optional): セッション
-        _ (User, optional): アドミンユーザー認証
-
-    Raises:
-        HTTPException: user_id, role_idで指定したリソースが見つからない場合の例外
-    """
-    user = crud_user.get_user(db, user_id)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    role = crud_role.get_role(db, role_id)
-    if role is None:
-        raise HTTPException(status_code=404, detail="Role not found")
-    return crud_user.append_role(db, user, role)

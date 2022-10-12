@@ -25,28 +25,28 @@ import { Plugin } from '@nuxt/types'
 
 declare module 'vue/types/vue' {
   interface Vue {
-    $itemAdminRole: string
+    $myVar: string
     $myFunc(message: string): void
   }
 }
 
 declare module '@nuxt/types' {
   interface NuxtAppOptions {
-    $itemAdminRole: string
+    $myVar: string
     $myFunc(message: string): void
   }
 }
 
 declare module 'vuex/types/index' {
   interface Store<S> {
-    $itemAdminRole: string
+    $myVar: string
     $myFunc(message: string): void
   }
 }
 
 const Settings: Plugin = (context, inject) => {
   // inject は context ではなく context.app にインジェクトされることに注意してください。
-  inject('itemAdminRole', "ItemAdminRole")
+  inject('myVar', "Hello")
   inject('myFunc', (message: string) => console.log(message))
 }
 

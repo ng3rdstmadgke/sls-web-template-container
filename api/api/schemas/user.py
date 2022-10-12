@@ -1,7 +1,6 @@
 from typing import List
 from pydantic import BaseModel
 
-from ..schemas.role import RoleSchema
 from ..schemas.item import ItemSchema
 
 class UserSchemaBase(BaseModel):
@@ -21,9 +20,6 @@ class UserSchema(UserSchemaBase):
     id: int
     is_superuser: bool
     is_active: bool
-    roles: List[RoleSchema] = []
-    # NOTE: 重くなるし使わないのでひとまず出力しない
-    #items: List[ItemSchema]
     
     class Config:
         orm_mode = True

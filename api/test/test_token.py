@@ -33,7 +33,7 @@ def test_create_token():
     secret_key = get_env().secret_key
     payload = jwt.decode(body["access_token" ], secret_key, algorithms=["HS256"])
     assert payload["sub"] == "admin"
-    assert payload["scopes"] == ["ItemAdminRole"]
+    assert payload["scopes"] == []
     assert payload["is_superuser"] == False
 
 def test_create_token_incorrect_username():

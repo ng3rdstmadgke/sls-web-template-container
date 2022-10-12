@@ -121,54 +121,58 @@ export default Vue.extend({
 
     },
     getNavigationItems(authenticated: boolean): any[] {
-      let items = [
-        {
-          icon: 'mdi-login',
-          title: 'Login',
-          to: '/login',
-          display: "notLoggedIn",
-          requireRole: null,
-        },
+      let itemAlways = [
         {
           icon: 'mdi-home',
           title: 'Home',
           to: '/',
-          display: "always",
-          requireRole: null,
         },
+
+      ]
+
+      let itemNotLogin = [
+        {
+          icon: 'mdi-login',
+          title: 'Login',
+          to: '/login',
+        },
+      ];
+
+      let itemLogin = [
         {
           icon: 'mdi-file-multiple',
           title: 'Items',
           to: '/items/',
-          display: "loggedIn",
-          requireRole: null,
+          requireSuperuser: false,
         },
         {
           icon: 'mdi-account',
           title: 'Users',
           to: '/users/',
-          display: "loggedIn",
-          requireRole: "SystemAdminRole",
+          requireSuperuser: true,
         },
-      ];
+
+      ]
 
       let ret = [];
+      for (let item of itemAlways) {
+        ret.push(item);
+      }
 
-      for (let item of items) {
-        if (authenticated && item.display == "notLoggedIn") {
-          continue;
-        }
-        if (!authenticated && item.display == "loggedIn") {
-          continue;
-        }
-        if (!item.requireRole) {
+      for (let item of itemNotLogin) {
+        if (!authenticated) {
           ret.push(item);
+        }
+      }
+
+      for (let item of itemLogin) {
+        if (!authenticated) {
           continue;
         }
-        if (item.requireRole && Auth.hasRole(this.$cookies, item.requireRole)) {
-          ret.push(item);
+        if (item.requireSuperuser && !Auth.isSuperuser(this.$cookies)) {
           continue;
         }
+        ret.push(item)
       }
       return ret;
     },

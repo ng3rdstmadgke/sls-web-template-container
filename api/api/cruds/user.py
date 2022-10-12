@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from .. import auth
 from ..models.user import User
-from ..models.role import Role
 from ..schemas.user import UserCreateSchema, UserUpdateSchema
 
 # Session API: https://docs.sqlalchemy.org/en/14/orm/session_api.html#sqlalchemy.orm.Session
@@ -63,11 +62,3 @@ def update_user(db: Session, user_schema: UserUpdateSchema, user: User) -> User:
 def delete_user(db: Session, user: User):
     db.delete(user)
     db.commit()
-
-def append_role(db: Session, user: User, role: Role) -> User:
-    user.roles.append(role)
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
-    

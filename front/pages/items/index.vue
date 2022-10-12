@@ -1,7 +1,7 @@
 <template>
 <div>
   <div class="mt-3 mb-3">
-    <v-row v-if="isItemAdmin">
+    <v-row>
       <v-col cols="12" sm="2">
         <v-btn block color="success" to="/items/create">new</v-btn>
       </v-col>
@@ -29,7 +29,7 @@
             color="primary"
             @click="download(item.id, $event)">Download</v-btn>
             <v-btn
-            v-if="item.owner && isItemAdmin"
+            v-if="item.owner"
             color="warning"
             v-bind:to="`/items/${item.id}/edit`">Edit</v-btn>
           </td>
@@ -87,9 +87,6 @@ export default Vue.extend({
     }
   },
   computed: {
-    isItemAdmin() {
-      return Auth.hasRole(this.$cookies, this.$itemAdminRole);
-    },
   },
   async asyncData(context: Context) {
     // plugins/axios.tsによって、tokenが存在する場合は Authorization ヘッダを付与してリクエストします。

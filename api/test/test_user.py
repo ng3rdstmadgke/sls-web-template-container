@@ -38,29 +38,6 @@ def test_create_success():
         'username': "test_1",
         'is_superuser': False,
         'is_active': True,
-        'roles': [],
-    }
-    assert body == expected
-
-def test_create_success_asocRole():
-    user_id = 2
-    role_id = 1
-
-    token = test_utils.get_token(client)
-    response = client.post(
-        f"/api/v1/users/{user_id}/roles/{role_id}",
-        headers={"Authorization": f"Bearer {token}"},
-    )
-    assert response.status_code == 200
-    body = response.json()
-    expected = {
-        'id': 2,
-        'username': "test_1",
-        'is_superuser': False,
-        'is_active': True,
-        'roles': [
-            {"id": role_id, "name": "ItemAdminRole", "description": None}
-        ],
     }
     assert body == expected
 
@@ -101,9 +78,6 @@ def test_read_success_me():
         'username': "admin",
         'is_superuser': True,
         'is_active': True,
-        'roles': [
-            {"id": 1, "name": "ItemAdminRole", "description": None}
-        ],
     }
     assert response.json() == expected
 
@@ -120,9 +94,6 @@ def test_read_success_getById():
         'username': "test_1",
         'is_superuser': False,
         'is_active': True,
-        'roles': [
-            {"id": 1, "name": "ItemAdminRole", "description": None}
-        ],
     }
     assert response.json() == expected
 
@@ -153,9 +124,6 @@ def test_update_success():
         'username': "test_1",
         'is_superuser': True,
         'is_active': False,
-        'roles': [
-            {"id": 1, "name": "ItemAdminRole", "description": None}
-        ],
     }
     assert response.json() == expected
     actual = test_utils.http_get(client, f"/api/v1/users/{id}")

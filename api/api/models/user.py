@@ -19,15 +19,9 @@ class User(Base):
 
     # カスケード: https://docs.sqlalchemy.org/en/14/orm/cascades.html
     # 一対多のリレーション: https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html#one-to-many
+    # 多対多のリレーション: https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html#many-to-many
     items = relationship(
         "Item",                      # リレーション先のモデルクラス名
         back_populates="user",       # リレーション先の変数名
         cascade="all, delete-orphan" # Userレコードを削除したとに関連するitemsを削除する(default="save-update")
-    )
-
-    # 多対多のリレーション: https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html#many-to-many
-    roles = relationship(
-        "Role",
-        secondary="user_roles", # 中間テーブルを指定
-        back_populates="users"
     )

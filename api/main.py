@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from api.api.db import db
-from api.api.routers import item, token, user, role
+from api.api.routers import item, token, user
 from api.api.env import get_env, Mode
 
 if get_env().mode == Mode.PRD:
@@ -40,7 +40,6 @@ app.add_middleware(
 )
 
 app.include_router(user.router, prefix="/api/v1")
-app.include_router(role.router, prefix="/api/v1")
 app.include_router(item.router, prefix="/api/v1")
 app.include_router(token.router, prefix="/api/v1")
 

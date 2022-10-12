@@ -36,10 +36,6 @@
           <td>is_superuser</td>
           <td>{{ $data.user.is_superuser }}</td>
         </tr>
-        <tr>
-          <td>roles</td>
-          <td>{{ $data.user.roles.map((e) => e.name).join(", ") }}</td>
-        </tr>
       </tbody>
     </template>
   </v-simple-table>

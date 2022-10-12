@@ -40,7 +40,7 @@ async def create(
     data_format: DataFormat = Form(...),
     _s3_client = Depends(s3_client_factory),
     db: Session = Depends(db.get_db),
-    current_user: User = Depends(auth.get_item_admin_user)
+    current_user: User = Depends(auth.get_current_active_user)
 ):
     content = await file.read()
     try:
@@ -64,7 +64,7 @@ def get_list(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(db.get_db),
-    current_user: User = Depends(auth.get_current_user)
+    current_user: User = Depends(auth.get_current_active_user)
 ):
     return crud_item.get_list_include_common(db, current_user.id, skip, limit)
 
@@ -73,7 +73,7 @@ def get_list(
 def get(
     item_id: int,
     db: Session = Depends(db.get_db),
-    current_user: User = Depends(auth.get_current_user)
+    current_user: User = Depends(auth.get_current_active_user)
 ):
     item = crud_item.get_include_common(db, current_user.id, item_id)
     if item is None:
@@ -87,7 +87,7 @@ def get(
 def download(
     item_id: int,
     db: Session = Depends(db.get_db),
-    current_user: User = Depends(auth.get_current_user)
+    current_user: User = Depends(auth.get_current_active_user)
 ):
     item = crud_item.get_include_common(db, current_user.id, item_id)
     if item is None:
@@ -116,7 +116,7 @@ async def update(
     is_common: bool = Form(...),
     data_format: DataFormat = Form(...),
     db: Session = Depends(db.get_db),
-    current_user: User = Depends(auth.get_item_admin_user)
+    current_user: User = Depends(auth.get_current_active_user)
 ):
     item = crud_item.get(db, current_user.id, item_id)
     if item is None:
@@ -141,7 +141,7 @@ async def update(
 def delete(
     item_id: int,
     db: Session = Depends(db.get_db),
-    current_user: User = Depends(auth.get_item_admin_user)
+    current_user: User = Depends(auth.get_current_active_user)
 ):
     item = crud_item.get(db, current_user.id, item_id)
     if item is None:

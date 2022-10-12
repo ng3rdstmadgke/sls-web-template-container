@@ -153,13 +153,4 @@ exit
 # 通常ユーザー作成
 ./bin/lib/manage.sh create_user user1
 ./bin/lib/manage.sh create_user user2
-
-# ロール作成
-./bin/lib/manage.sh create_role ItemAdminRole
-
-# ロールのアタッチ
-./bin/lib/manage.sh attach_role user1 ItemAdminRole
-
-# ロールのデタッチ
-./bin/lib/manage.sh detach_role user1 ItemAdminRole
 ```

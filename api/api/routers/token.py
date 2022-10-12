@@ -34,7 +34,7 @@ def login_for_access_token(
         # JWT "sub" Claim : https://openid-foundation-japan.github.io/draft-ietf-oauth-json-web-token-11.ja.html#subDef
         payload={
             "sub": user.username,
-            "scopes": [role.name for role in user.roles],
+            "scopes": [],
             "is_superuser": user.is_superuser,
         },
         expires_delta=access_token_expires

@@ -4,10 +4,8 @@ from functools import lru_cache
 
 from fastapi.testclient import TestClient
 from ...api.schemas.user import UserCreateSchema
-from ...api.schemas.role import RoleCreateSchema
 from ...api.cruds import (
     user as crud_user,
-    role as crud_role,
 )
 
 
@@ -29,7 +27,6 @@ def create_user(
     session_factory,
     username: str = "admin",
     password: str = "admin1234",
-    roles: List[str] = ["ItemAdminRole"],
     is_superuser: bool = False,
 ):
     with session_factory() as session:
@@ -37,12 +34,6 @@ def create_user(
             session,
             UserCreateSchema(username=username, password=password),
         )
-        for role in roles:
-            role = crud_role.create_role(
-                session,
-                RoleCreateSchema(name=role)
-            )
-            user.roles.append(role)
         user.is_superuser = is_superuser
         session.add(user)
         session.commit()
@@ -56,18 +47,3 @@ def http_get(client, url: str) -> List[Dict[str, Any]]:
     if response.status_code != 200:
         raise Exception(f"{response.status_code}: {response.content}")
     return response.json()
-
-def create_role(client, name: str, desc: str = "") -> Dict[str, Any]:
-    token = get_token(client)
-    response = client.post(
-        f"/api/v1/roles/",
-        json={
-            "name": name,
-            "description": desc
-        },
-        headers={"Authorization": f"Bearer {token}"},
-    )
-    if response.status_code != 200:
-        raise Exception(f"{response.status_code}: {response.content}")
-    return response.json()
-    

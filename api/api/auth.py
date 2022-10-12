@@ -75,22 +75,6 @@ def create_access_token(payload: dict, expires_delta: Optional[timedelta] = None
     return encoded_jwt
 
 
-def has_role(user: User, role_name: str) -> bool:
-    """ユーザーが指定されたロールを持っているかを判定する
-
-    Args:
-        user (User): ユーザー
-        role_name (str): ロール
-
-    Returns:
-        bool: ロールを持っている場合はTrue
-    """
-    for role in user.roles:
-        if role.name == role_name:
-            return True
-    return False
-
-
 def get_current_user(db: Session = Depends(db.get_db), token: str = Depends(oauth2_scheme)) -> User:
     """JWTの署名検証を行い、subに格納されているusernameからUserオブジェクトを取得する
     引数のtokenには "/api/v1/token" でリターンした access_token が格納されている
@@ -140,31 +124,6 @@ def get_current_active_user(current_user: User = Depends(get_current_user)) -> U
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
-
-
-def get_item_admin_user(current_user: User = Depends(get_current_user)) -> User:
-    """itemの管理者操作権限(ItemAdminRoleロール)を持つアカウントを取得する。
-
-    Args:
-        current_user (User, optional): 現在のユーザー
-
-    Raises:
-        HTTPException: ItemAdminRoleを持たない、is_activeがFalseの場合は400エラー
-
-    Returns:
-        User: ItemAdminRoleを持つユーザー
-    """
-    item_admin_role = "ItemAdminRole"
-    if not current_user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    if current_user.is_superuser:
-        # 管理者ユーザーは無条件ですべての権限を持つ
-        return current_user
-    elif has_role(current_user, item_admin_role):
-        return current_user
-    else:
-        logger.info(f"user do not have ItemAdminRole (username={current_user.username})")
-        raise HTTPException(status_code=400, detail="Invalid authentication credentials")
 
 
 def get_current_admin_user(current_user: User = Depends(get_current_user)) -> User:

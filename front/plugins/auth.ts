@@ -83,16 +83,6 @@ export default class Auth {
     return is_superuser
   }
 
-  public static hasRole(cookie: NuxtCookies, role: string): boolean {
-    if (Auth.isSuperuser(cookie)) {
-      // 管理者は無条件ですべての権限を持つ
-      return true
-    }
-    let payload = Auth.getPayload(cookie);
-    let roles: string[] = (payload && !!payload.scopes) ? payload.scopes : []
-    return roles.indexOf(role) >= 0
-  }
-
   public static getUsername(cookie: NuxtCookies): string | null {
     let payload = Auth.getPayload(cookie);
     return (payload && !!payload.sub) ? payload.sub : null

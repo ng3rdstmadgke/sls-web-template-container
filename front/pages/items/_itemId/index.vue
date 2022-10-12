@@ -6,10 +6,10 @@
       <v-col cols="4" sm="2">
         <v-btn block color="primary" @click="download()">Download</v-btn>
       </v-col>
-      <v-col cols="4" sm="2" v-if="item.owner && isItemAdmin">
+      <v-col cols="4" sm="2" v-if="item.owner">
         <v-btn block color="warning" v-bind:to="`/items/${$route.params.itemId}/edit`">Edit</v-btn>
       </v-col>
-      <v-col cols="4" sm="2" v-if="item.owner && isItemAdmin">
+      <v-col cols="4" sm="2" v-if="item.owner">
         <v-btn block color="error" v-on:click="openDeleteConfirmDialog()">Delete</v-btn>
       </v-col>
     </v-row>
@@ -126,9 +126,6 @@ export default Vue.extend({
   },
 
   computed: {
-    isItemAdmin() {
-      return Auth.hasRole(this.$cookies, this.$itemAdminRole);
-    },
   },
 
   methods: {
