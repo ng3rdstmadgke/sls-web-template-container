@@ -33,18 +33,45 @@ vim ./profile/${STAGE_NAME}.yml
 ```
 
 # 開発環境
-## 開発サーバー起動
+## イメージビルド
 
 ```bash
-# 開発用イメージビルド
 ./bin/build.sh
+```
 
-# 開発用データベース起動
+## 開発用データベース起動
+
+```bash
 ./bin/run-mysql.sh -d
 
-# テスト
-./bin/test.sh
+```
 
+## マイグレーションなど
+
+```bash
+# devコンテナ起動
+./bin/shell.sh -e local.env
+```
+
+devコンテナ内での操作
+
+```bash
+# DB作成
+./bin/lib/create-database.sh
+
+# マイグレーション
+./bin/lib/alembic.sh upgrade head
+
+# スーパーユーザー作成
+./bin/lib/manage.sh create_user admin --superuser
+
+# devコンテナからログアウト
+exit
+```
+
+## アプリ起動
+
+```bash
 # アプリ起動
 ./bin/run.sh -e local.env
 
@@ -68,18 +95,18 @@ vim ./profile/${STAGE_NAME}.yml
 
 # 運用
 
-## オペレーションshell起動
+## devコンテナ起動
 
 ```bash
 # 開発用データベース起動
 ./bin/run-mysql.sh -d
 
-# オペレーション用shell起動
+# devコンテナ起動
 ./bin/shell.sh -e <ENV_PATH>
 
 ```
 
-## マイグレーション(オペレーションshell内での操作)
+## マイグレーション(devコンテナ内での操作)
 
 ```bash
 # DB作成
@@ -104,7 +131,7 @@ vim ./profile/${STAGE_NAME}.yml
 ./bin/lib/alembic.sh revision --autogenerate -m "message"
 ```
 
-## DBログイン(オペレーションshell内での操作)
+## DBログイン(devコンテナ内での操作)
 
 ```bash
 # DB作成
@@ -114,7 +141,7 @@ vim ./profile/${STAGE_NAME}.yml
 ./bin/lib/mysql.sh
 ```
 
-## マネジメントコマンド(オペレーションshell内での操作)
+## マネジメントコマンド(devコンテナ内での操作)
 
 ```bash
 # ヘルプ
