@@ -43,7 +43,6 @@ vim ./profile/${STAGE_NAME}.yml
 
 ```bash
 ./bin/run-mysql.sh -d
-
 ```
 
 ## マイグレーションなど
