@@ -24,13 +24,11 @@ EOS
 exit 1
 }
 
-SCRIPT_DIR="$(cd $(dirname $0); pwd)"
-PROJECT_ROOT="$(cd ${SCRIPT_DIR}/..; pwd)"
+PROJECT_ROOT="$(cd $(dirname $0)/..; pwd)"
 API_DIR="$(cd ${PROJECT_ROOT}/api; pwd)"
 FRONT_DIR="$(cd ${PROJECT_ROOT}/front; pwd)"
 CONTAINER_DIR="$(cd ${PROJECT_ROOT}/docker; pwd)"
-
-source "${SCRIPT_DIR}/lib/utils.sh"
+source "${PROJECT_ROOT}/bin/lib/utils.sh"
 
 OPTIONS=
 ENV_PATH=

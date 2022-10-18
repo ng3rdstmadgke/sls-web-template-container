@@ -42,6 +42,8 @@ useradd -u $HOST_UID -o -m -g $HOST_GID -s /bin/bash $UNAME
 # sysadmin グループに追加
 usermod -aG sysadmin $UNAME
 
+mkdir -p /opt/app/front_dist
+
 # マウント先のを所有者作成したユーザーとグループに変更
 chown -R $HOST_UID:$HOST_GID /opt/app
 
