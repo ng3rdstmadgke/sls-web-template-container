@@ -5,6 +5,8 @@
   - Secrets Manager
     - RDSの接続情報
     - JWTの秘密鍵
+- slsコマンドコンテナ化
+  - devコンテナに組み込む
 
 # インストール
 
