@@ -46,7 +46,10 @@ RUN groupadd -g 13567 sysadmin && echo "%sysadmin ALL=(ALL:ALL) NOPASSWD: ALL" >
 
 COPY . .
 
-RUN cd /opt/app/front && npm update -g npm && npm install && npm run generate
+RUN cd /opt/app/front && \
+  npm update -g npm && \
+  npm install && \
+  npm run generate
 
 ENTRYPOINT []
 

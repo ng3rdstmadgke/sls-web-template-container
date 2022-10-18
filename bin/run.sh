@@ -14,6 +14,8 @@ cat >&2 <<EOS
    バックグラウンドで起動
  -e | --env-file <ENV_PATH>:
    apiコンテナ用の環境変数ファイルを指定(default=.env)
+ --debug:
+   デバッグモードで起動
  --profile <AWS_PROFILE>:
    awsのプロファイル名を指定 (default=default)
  --region <AWS_REGION>:
@@ -35,12 +37,14 @@ ENV_PATH=
 AWS_PROFILE="default"
 AWS_REGION="ap-northeast-1"
 PROXY=
+DEBUG=
 args=()
 while [ "$#" != 0 ]; do
   case $1 in
     -h | --help      ) usage;;
-    -d | --daemon    ) shift;OPTIONS="$OPTIONS -d";;
+    -d | --daemon    ) OPTIONS="$OPTIONS -d";;
     -e | --env-file  ) shift;ENV_PATH="$1";;
+    --debug          ) DEBUG="1";;
     --profile        ) shift;AWS_PROFILE="$1";;
     --region         ) shift;AWS_REGION="$1";;
     --proxy          ) PROXY="1";;
@@ -68,7 +72,6 @@ if [ -n "$PROXY" ]; then
   echo "NO_PROXY=$no_proxy" >> "$env_tmp"
 fi
 
-trap "docker-compose -f docker-compose-dev.yml down; rm -f $env_tmp" EXIT
 invoke export PROJECT_ROOT="$PROJECT_ROOT"
 invoke export ENV_PATH="$env_tmp"
 invoke export APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
@@ -76,5 +79,13 @@ invoke export APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
 cd "$CONTAINER_DIR"
 invoke export LOCAL_UID=$(id -u)
 invoke export LOCAL_GID=$(id -g)
-invoke docker-compose -f docker-compose-dev.yml down
-invoke docker-compose -f docker-compose-dev.yml up $OPTIONS
+
+if [ -n "$DEBUG" ]; then
+  trap "docker-compose -f docker-compose-dev.yml down; rm -f $env_tmp" EXIT
+  invoke docker-compose -f docker-compose-dev.yml down
+  invoke docker-compose -f docker-compose-dev.yml up $OPTIONS
+else
+  trap "docker-compose -f docker-compose.yml down; rm -f $env_tmp" EXIT
+  invoke docker-compose -f docker-compose.yml down
+  invoke docker-compose -f docker-compose.yml up $OPTIONS
+fi
