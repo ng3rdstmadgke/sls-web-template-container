@@ -12,6 +12,10 @@ dockerイメージpushコマンド
    ヘルプを表示
  -s | --stage <STAGE>: (required)
    pushするステージ名を指定(stg, prd, など)
+ --profile <AWS_PROFILE>:
+   awsのプロファイル名を指定 例) default
+ --region <AWS_REGION>:
+   awsのリージョンを指定 例) ap-northeast-1
  --build-only:
    ビルドのみを行う
  --no-cache:
@@ -31,11 +35,16 @@ APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
 STAGE=
 BUILD_OPTIONS=
 BUILD_ONLY=
+AWS_PROFILE=
+AWS_REGION="ap-northeast-1"
+AWS_PROFILE_OPTION=
 args=()
 while [ "$#" != 0 ]; do
   case $1 in
     -h | --help  ) usage;;
-    -s | --stage ) shift;STAGE="$1";;
+    -s | --stage ) shift; STAGE="$1";;
+    --profile    ) shift; AWS_PROFILE="$1"; AWS_PROFILE_OPTION="--profile $1";;
+    --region     ) shift; AWS_REGION="$1";;
     --build-only ) BUILD_ONLY=1;;
     --no-cache   ) BUILD_OPTIONS="$BUILD_OPTIONS --no-cache";;
     --proxy      ) BUILD_OPTIONS="$BUILD_OPTIONS --build-arg proxy=$proxy --build-arg no_proxy=$no_proxy";;
@@ -51,9 +60,7 @@ done
 set -e
 trap 'echo "[$BASH_SOURCE:$LINENO] - "$BASH_COMMAND" returns not zero status"' ERR
 
-AWS_REGION="ap-northeast-1"
-AWS_PROFILE="default"
-AWS_ACCOUNT_ID=$(aws --profile $AWS_PROFILE sts get-caller-identity --query 'Account' --output text)
+AWS_ACCOUNT_ID=$(aws $AWS_PROFILE_OPTION sts get-caller-identity --query 'Account' --output text)
 
 info "AWS_REGION: $AWS_REGION"
 info "AWS_PROFILE: $AWS_PROFILE"

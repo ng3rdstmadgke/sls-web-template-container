@@ -17,9 +17,9 @@ cat >&2 <<EOS
  --debug:
    デバッグモードで起動
  --profile <AWS_PROFILE>:
-   awsのプロファイル名を指定 (default=default)
+   awsのプロファイル名を指定 例) default
  --region <AWS_REGION>:
-   awsのリージョンを指定 (default=ap-northeast-1)
+   awsのリージョンを指定 例) ap-northeast-1
  --proxy:
    プロキシ設定を有効化
 EOS
@@ -34,8 +34,8 @@ source "${PROJECT_ROOT}/bin/lib/utils.sh"
 
 OPTIONS=
 ENV_PATH=
-AWS_PROFILE="default"
-AWS_REGION="ap-northeast-1"
+AWS_PROFILE_OPTION=
+AWS_REGION_OPTION=
 PROXY=
 DEBUG=
 args=()
@@ -45,8 +45,8 @@ while [ "$#" != 0 ]; do
     -d | --daemon    ) OPTIONS="$OPTIONS -d";;
     -e | --env-file  ) shift;ENV_PATH="$1";;
     --debug          ) DEBUG="1";;
-    --profile        ) shift;AWS_PROFILE="$1";;
-    --region         ) shift;AWS_REGION="$1";;
+    --profile        ) shift;AWS_PROFILE_OPTION="--profile $1";;
+    --region         ) shift;AWS_REGION_OPTION="--region $1";;
     --proxy          ) PROXY="1";;
     -* | --*         ) error "$1 : 不正なオプションです" ;;
     *                ) args+=("$1");;
@@ -61,8 +61,8 @@ done
 env_tmp="$(mktemp)"
 cat "$ENV_PATH" > "$env_tmp"
 
-AWS_ACCESS_KEY_ID=$(aws --profile $AWS_PROFILE --region $AWS_REGION configure get aws_access_key_id)
-AWS_SECRET_ACCESS_KEY=$(aws --profile $AWS_PROFILE --region $AWS_REGION configure get aws_secret_access_key)
+AWS_ACCESS_KEY_ID=$(aws $AWS_PROFILE_OPTION $AWS_REGION_OPTION configure get aws_access_key_id)
+AWS_SECRET_ACCESS_KEY=$(aws $AWS_PROFILE_OPTION $AWS_REGION_OPTION configure get aws_secret_access_key)
 echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$env_tmp"
 echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$env_tmp"
 
