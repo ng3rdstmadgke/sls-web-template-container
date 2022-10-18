@@ -71,7 +71,10 @@ exit
 ## アプリ起動
 
 ```bash
-# アプリ起動
+# アプリ起動 (開発モード)
+./bin/run.sh --debug -e local.env
+
+# アプリ起動 (本番モード)
 ./bin/run.sh -e local.env
 
 # アクセス
@@ -88,8 +91,15 @@ exit
 # 開発用データベース起動
 ./bin/run-mysql.sh -d
 
-# テスト
-./bin/test.sh
+# devコンテナ起動
+./bin/shell.sh -e local.env
+```
+
+devコンテナ内での操作
+
+```bash
+# テスト実行
+./bin/lib/test.sh
 ```
 
 # 運用

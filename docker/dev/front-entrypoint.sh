@@ -1,27 +1,4 @@
 #!/bin/bash
-function usage {
-cat >&2 <<EOS
-nuxtアプリ起動コマンド
-
-[usage]
- $0 [options]
-
-[options]
- -h | --help:
-   ヘルプを表示
-EOS
-exit 1
-}
-
-while [ "$#" != 0 ]; do
-  case $1 in
-    -h | --help ) usage;;
-    -* | --*    ) echo "$1 : 不正なオプションです" >&2; exit 1;;
-    *           ) args+=("$1");;
-  esac
-  shift
-done
-
 HOST_UID=${LOCAL_UID}
 HOST_GID=${LOCAL_GID}
 

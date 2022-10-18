@@ -11,3 +11,7 @@ invoke alembic upgrade head
 
 cd $PROJECT_ROOT
 invoke pytest api/test -s
+
+cd $API_DIR
+invoke alembic downgrade base
+invoke alembic upgrade head
