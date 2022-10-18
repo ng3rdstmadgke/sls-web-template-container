@@ -85,7 +85,7 @@ export default Vue.extend({
     return {
       drawer: false,
       fixed: false,
-      title: 'TransApp',
+      title: 'web-template',
     }
   },
 
