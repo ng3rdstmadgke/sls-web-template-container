@@ -1,3 +1,11 @@
+# TODO
+
+- IaCの整備
+  - RDS
+  - Secrets Manager
+    - RDSの接続情報
+    - JWTの秘密鍵
+
 # インストール
 
 ```bash
