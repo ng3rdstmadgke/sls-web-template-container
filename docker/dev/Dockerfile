@@ -2,6 +2,8 @@ FROM public.ecr.aws/lambda/python:3.8
 
 ARG proxy
 ARG no_proxy
+ARG host_uid
+ARG host_gid
 
 ENV http_proxy=$proxy
 ENV https_proxy=$proxy
@@ -42,14 +44,22 @@ WORKDIR /opt/app
 COPY requirements.txt .
 RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
 
-RUN groupadd -g 13567 sysadmin && echo "%sysadmin ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/sysadmin
-
-COPY . .
+COPY front front
 
 RUN cd /opt/app/front && \
   npm update -g npm && \
   npm install && \
   npm run generate
+
+COPY . .
+
+RUN groupadd -g 13567 sysadmin && echo "%sysadmin ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/sysadmin
+
+RUN groupadd -g $host_gid app && \
+    useradd -u $host_uid -o -m -g $host_gid -s /bin/bash app && \
+    usermod -aG sysadmin app
+
+RUN chown -R app:app /opt
 
 ENTRYPOINT []
 

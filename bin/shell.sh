@@ -69,8 +69,6 @@ trap 'rm -f $env_tmp;' EXIT
 docker run --rm -ti \
   --network host \
   --env-file "$env_tmp" \
-  -e LOCAL_UID=$(id -u) \
-  -e LOCAL_GID=$(id -g) \
   -v "${PROJECT_ROOT}:/opt/app" \
   "${APP_NAME}/dev:latest" \
-  /opt/app/docker/dev/shell-entrypoint.sh
+  su app

@@ -74,13 +74,13 @@ devコンテナ内での操作
 
 ```bash
 # DB作成
-./bin/lib/create-database.sh
+/opt/app/bin/lib/create-database.sh
 
 # マイグレーション
-./bin/lib/alembic.sh upgrade head
+/opt/app/bin/lib/alembic.sh upgrade head
 
 # スーパーユーザー作成
-./bin/lib/manage.sh create_user admin --superuser
+/opt/app/bin/lib/manage.sh create_user admin --superuser
 
 # devコンテナからログアウト
 exit

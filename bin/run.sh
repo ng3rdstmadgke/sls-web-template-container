@@ -22,6 +22,23 @@ cat >&2 <<EOS
    awsのリージョンを指定 例) ap-northeast-1
  --proxy:
    プロキシ設定を有効化
+
+[example]
+ - 開発用コンテナを起動する手順
+   # mysqlコンテナ起動
+   $(dirname $0)/run-mysql.sh -d
+
+   # devコンテナ起動
+   $(dirname $0)/shell.sh -e local.env
+
+   # devコンテナ内でマイグレーション (deコンテナでの操作)
+   $ /opt/app/bin/lib/create-database.sh
+   $ /opt/app/bin/lib/alembic.sh upgrade head
+   $ /opt/app/bin/lib/manage.sh create_user admin --superuser
+   $ exit
+
+   # アプリ起動
+   ./bin/run.sh --debug -e local.env
 EOS
 exit 1
 }
@@ -77,15 +94,15 @@ invoke export ENV_PATH="$env_tmp"
 invoke export APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
 
 cd "$CONTAINER_DIR"
-invoke export LOCAL_UID=$(id -u)
-invoke export LOCAL_GID=$(id -g)
 
 if [ -n "$DEBUG" ]; then
+  invoke export LOCAL_UID=$(id -u)
+  invoke export LOCAL_GID=$(id -g)
   trap "docker-compose -f docker-compose-dev.yml down; rm -f $env_tmp" EXIT
   invoke docker-compose -f docker-compose-dev.yml down
-  invoke docker-compose -f docker-compose-dev.yml up $OPTIONS
+  invoke docker-compose -f docker-compose-dev.yml up --remove-orphans $OPTIONS
 else
   trap "docker-compose -f docker-compose.yml down; rm -f $env_tmp" EXIT
   invoke docker-compose -f docker-compose.yml down
-  invoke docker-compose -f docker-compose.yml up $OPTIONS
+  invoke docker-compose -f docker-compose.yml up --remove-orphans $OPTIONS
 fi

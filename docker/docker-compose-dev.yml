@@ -9,9 +9,9 @@ services:
         source: "${PROJECT_ROOT}"
         target: "/opt/app"
     command: /opt/app/docker/dev/api-entrypoint.sh
-    environment:
-      - LOCAL_UID=${LOCAL_UID}
-      - LOCAL_GID=${LOCAL_GID}
+    user: "app"
+    group_add:
+      - sysadmin
     env_file:
       - "${ENV_PATH}"
     network_mode: host
@@ -23,7 +23,7 @@ services:
         source: "${PROJECT_ROOT}"
         target: "/opt/app"
     command: /opt/app/docker/dev/front-entrypoint.sh
-    environment:
-      - LOCAL_UID=${LOCAL_UID}
-      - LOCAL_GID=${LOCAL_GID}
+    user: "app"
+    group_add:
+      - sysadmin
     network_mode: host

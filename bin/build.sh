@@ -43,5 +43,7 @@ done
 
 cd "$PROJECT_ROOT"
 set -e
+OPTIONS="$OPTIONS --build-arg host_uid=$(id -u)"
+OPTIONS="$OPTIONS --build-arg host_gid=$(id -g)"
 invoke docker build $OPTIONS --rm -f docker/mysql/Dockerfile -t "${APP_NAME}/mysql:latest" .
 invoke docker build $OPTIONS --rm -f docker/dev/Dockerfile -t "${APP_NAME}/dev:latest" .
