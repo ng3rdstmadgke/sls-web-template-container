@@ -34,18 +34,21 @@ RUN cd /tmp && \
     rm -r aws awscliv2.zip
 
 # install nodejs
-RUN curl -fsSL https://rpm.nodesource.com/setup_lts.x | bash -
+RUN curl -fsSL https://rpm.nodesource.com/setup_16.x | bash -
 RUN yum install -y nodejs
 
 RUN mkdir -p /opt/app
 WORKDIR /opt/app
 
+# supervisor
+RUN pip install supervisor
+
 # pip install
 COPY requirements.txt .
 RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
 
+# npm install
 COPY front front
-
 RUN cd /opt/app/front && \
   npm update -g npm && \
   npm install && \
@@ -63,4 +66,4 @@ RUN chown -R app:app /opt
 
 ENTRYPOINT []
 
-CMD ["/opt/app/docker/dev/shell-entrypoint.sh"]
+CMD ["/bin/bash"]

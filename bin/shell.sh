@@ -66,9 +66,12 @@ fi
 set -e
 trap 'rm -f $env_tmp;' EXIT
 
+export LOCAL_UID=$(id -u)
+export LOCAL_GID=$(id -g)
 docker run --rm -ti \
   --network host \
   --env-file "$env_tmp" \
+  --user $LOCAL_UID:$LOCAL_GID \
   -v "${PROJECT_ROOT}:/opt/app" \
   "${APP_NAME}/dev:latest" \
-  su app
+  /bin/bash

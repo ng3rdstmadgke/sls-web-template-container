@@ -49,7 +49,7 @@ FRONT_DIR="$(cd ${PROJECT_ROOT}/front; pwd)"
 CONTAINER_DIR="$(cd ${PROJECT_ROOT}/docker; pwd)"
 source "${PROJECT_ROOT}/bin/lib/utils.sh"
 
-OPTIONS=
+RUN_OPTIONS=
 ENV_PATH=
 AWS_PROFILE_OPTION=
 AWS_REGION_OPTION=
@@ -59,7 +59,7 @@ args=()
 while [ "$#" != 0 ]; do
   case $1 in
     -h | --help      ) usage;;
-    -d | --daemon    ) OPTIONS="$OPTIONS -d";;
+    -d | --daemon    ) RUN_OPTIONS="$RUN_OPTIONS -d";;
     -e | --env-file  ) shift;ENV_PATH="$1";;
     --debug          ) DEBUG="1";;
     --profile        ) shift;AWS_PROFILE_OPTION="--profile $1";;
@@ -93,16 +93,25 @@ invoke export PROJECT_ROOT="$PROJECT_ROOT"
 invoke export ENV_PATH="$env_tmp"
 invoke export APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
 
-cd "$CONTAINER_DIR"
+# Docker build
+cd "$PROJECT_ROOT"
+export LOCAL_UID=$(id -u)
+export LOCAL_GID=$(id -g)
 
+# Docker run
 if [ -n "$DEBUG" ]; then
-  invoke export LOCAL_UID=$(id -u)
-  invoke export LOCAL_GID=$(id -g)
-  trap "docker-compose -f docker-compose-dev.yml down; rm -f $env_tmp" EXIT
-  invoke docker-compose -f docker-compose-dev.yml down
-  invoke docker-compose -f docker-compose-dev.yml up --remove-orphans $OPTIONS
+  invoke docker run --rm -ti \
+    --network host \
+    --env-file "$env_tmp" \
+    --user $LOCAL_UID:$LOCAL_GID \
+    -v "${PROJECT_ROOT}:/opt/app" \
+    "${APP_NAME}/dev:latest" \
+    supervisord -c /opt/app/docker/dev/supervisor/supervisord.conf
 else
-  trap "docker-compose -f docker-compose.yml down; rm -f $env_tmp" EXIT
-  invoke docker-compose -f docker-compose.yml down
-  invoke docker-compose -f docker-compose.yml up --remove-orphans $OPTIONS
+  invoke docker run --rm -ti \
+    --network host \
+    --env-file "$env_tmp" \
+    --user $LOCAL_UID:$LOCAL_GID \
+    "${APP_NAME}/dev:latest" \
+    /opt/app/docker/dev/entrypoint-prd.sh
 fi
