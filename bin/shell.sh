@@ -72,6 +72,6 @@ docker run --rm -ti \
   --network host \
   --env-file "$env_tmp" \
   --user $LOCAL_UID:$LOCAL_GID \
-  -v "${PROJECT_ROOT}:/opt/app" \
+  -v "${PROJECT_ROOT}/app:/opt/app" \
   "${APP_NAME}/dev:latest" \
   /bin/bash
