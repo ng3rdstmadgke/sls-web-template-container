@@ -20,9 +20,7 @@ exit 1
 
 SCRIPT_DIR="$(cd $(dirname $0); pwd)"
 PROJECT_ROOT="$(cd ${SCRIPT_DIR}/..; pwd)"
-API_DIR="$(cd ${PROJECT_ROOT}/api; pwd)"
 CONTAINER_DIR="$(cd ${PROJECT_ROOT}/docker; pwd)"
-BIN_DIR="$(cd ${PROJECT_ROOT}/bin; pwd)"
 
 source "${SCRIPT_DIR}/lib/utils.sh"
 
@@ -30,7 +28,7 @@ APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
 
 OPTIONS=
 DAEMON=
-ENV_PATH="${PROJECT_ROOT}/local.env"
+ENV_PATH="${PROJECT_ROOT}/app/local.env"
 args=()
 while [ "$#" != 0 ]; do
   case $1 in
@@ -55,6 +53,7 @@ export $(cat $env_tmp | grep -v -e "^ *#.*")
 
 
 cd "$CONTAINER_DIR"
+invoke docker rm -f ${APP_NAME}-mysql
 if [ -n "$DAEMON" ]; then
   invoke docker run $OPTIONS \
     -d \
@@ -71,9 +70,8 @@ if [ -n "$DAEMON" ]; then
     --name ${APP_NAME}-mysql-check \
     --env-file "$env_tmp" \
     --network host \
-    -v "${PROJECT_ROOT}:/opt/app" \
-    "${APP_NAME}/api:latest" \
-    /opt/app/bin/lib/check-mysql-boot.sh
+    "${APP_NAME}/mysql:latest" \
+    /usr/local/bin/check-mysql-boot.sh
 else
   invoke docker run $OPTIONS \
     -ti \
