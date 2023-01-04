@@ -67,20 +67,20 @@ sls remove --stage ${STAGE_NAME}
 
 ```bash
 # devコンテナ起動
-./bin/shell.sh -e local.env
+./bin/shell.sh -e app/local.env
 ```
 
 devコンテナ内での操作
 
 ```bash
 # DB作成
-/opt/app/bin/lib/create-database.sh
+/opt/app/bin/create-database.sh
 
 # マイグレーション
-/opt/app/bin/lib/alembic.sh upgrade head
+/opt/app/bin/alembic.sh upgrade head
 
 # スーパーユーザー作成
-/opt/app/bin/lib/manage.sh create_user admin --superuser
+/opt/app/bin/manage.sh create_user admin --superuser
 
 # devコンテナからログアウト
 exit
@@ -90,10 +90,10 @@ exit
 
 ```bash
 # アプリ起動 (開発モード)
-./bin/run.sh --debug -e local.env
+./bin/run.sh --debug -e app/local.env
 
 # アプリ起動 (本番モード)
-./bin/run.sh -e local.env
+./bin/run.sh -e app/local.env
 
 # アクセス
 # http://localhost:3000/
@@ -110,14 +110,14 @@ exit
 ./bin/run-mysql.sh -d
 
 # devコンテナ起動
-./bin/shell.sh -e local.env
+./bin/shell.sh -e app/local.env
 ```
 
 devコンテナ内での操作
 
 ```bash
 # テスト実行
-./bin/lib/test.sh
+./bin/test.sh
 ```
 
 # 運用
@@ -137,47 +137,47 @@ devコンテナ内での操作
 
 ```bash
 # DB作成
-./bin/lib/create-database.sh
+./bin/create-database.sh
 
 # マイグレーション: 履歴確認
-./bin/lib/alembic.sh history -v
+./bin/alembic.sh history -v
 
 # マイグレーション: 最新バージョンにアップグレード
-./bin/lib/alembic.sh upgrade head
+./bin/alembic.sh upgrade head
 
 # マイグレーション: 次のバージョンにアップグレード
-./bin/lib/alembic.sh upgrade +1
+./bin/alembic.sh upgrade +1
 
 # マイグレーション: 最初のバージョンにダウングレード
-./bin/lib/alembic.sh downgrade base
+./bin/alembic.sh downgrade base
 
 # マイグレーション: 次のバージョンにダウングレード
-./bin/lib/alembic.sh downgrade -1
+./bin/alembic.sh downgrade -1
 
 # マイグレーション: マイグレーションファイル生成
-./bin/lib/alembic.sh revision --autogenerate -m "message"
+./bin/alembic.sh revision --autogenerate -m "message"
 ```
 
 ## DBログイン(devコンテナ内での操作)
 
 ```bash
 # DB作成
-./bin/lib/create-database.sh
+./bin/create-database.sh
 
 # mysql ログイン
-./bin/lib/mysql.sh
+./bin/mysql.sh
 ```
 
 ## マネジメントコマンド(devコンテナ内での操作)
 
 ```bash
 # ヘルプ
-./bin/lib/manage.sh
+./bin/manage.sh
 
 # スーパーユーザー作成
-./bin/lib/manage.sh create_user admin --superuser
+./bin/manage.sh create_user admin --superuser
 
 # 通常ユーザー作成
-./bin/lib/manage.sh create_user user1
-./bin/lib/manage.sh create_user user2
+./bin/manage.sh create_user user1
+./bin/manage.sh create_user user2
 ```

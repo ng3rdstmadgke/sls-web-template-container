@@ -29,24 +29,21 @@ cat >&2 <<EOS
    $(dirname $0)/run-mysql.sh -d
 
    # devコンテナ起動
-   $(dirname $0)/shell.sh -e local.env
+   $(dirname $0)/shell.sh -e app/local.env
 
    # devコンテナ内でマイグレーション (deコンテナでの操作)
-   $ /opt/app/bin/lib/create-database.sh
-   $ /opt/app/bin/lib/alembic.sh upgrade head
-   $ /opt/app/bin/lib/manage.sh create_user admin --superuser
+   $ /opt/app/bin/create-database.sh
+   $ /opt/app/bin/alembic.sh upgrade head
+   $ /opt/app/bin/manage.sh create_user admin --superuser
    $ exit
 
    # アプリ起動
-   ./bin/run.sh --debug -e local.env
+   ./bin/run.sh --debug -e app/local.env
 EOS
 exit 1
 }
 
 PROJECT_ROOT="$(cd $(dirname $0)/..; pwd)"
-API_DIR="$(cd ${PROJECT_ROOT}/api; pwd)"
-FRONT_DIR="$(cd ${PROJECT_ROOT}/front; pwd)"
-CONTAINER_DIR="$(cd ${PROJECT_ROOT}/docker; pwd)"
 source "${PROJECT_ROOT}/bin/lib/utils.sh"
 
 RUN_OPTIONS=
@@ -104,14 +101,14 @@ if [ -n "$DEBUG" ]; then
     --network host \
     --env-file "$env_tmp" \
     --user $LOCAL_UID:$LOCAL_GID \
-    -v "${PROJECT_ROOT}:/opt/app" \
+    -v "${PROJECT_ROOT}/app:/opt/app" \
     "${APP_NAME}/dev:latest" \
-    supervisord -c /opt/app/docker/dev/supervisor/supervisord.conf
+    supervisord -c /etc/supervisor/supervisord.conf
 else
   invoke docker run --rm -ti \
     --network host \
     --env-file "$env_tmp" \
     --user $LOCAL_UID:$LOCAL_GID \
     "${APP_NAME}/dev:latest" \
-    /opt/app/docker/dev/entrypoint-prd.sh
+    /usr/local/bin/entrypoint-prd.sh
 fi

@@ -65,6 +65,12 @@ RUN groupadd -g $host_gid app && \
 
 RUN chown -R app:app /opt
 
+# supervisorの設定ファイルとコンテナのエントリーポイント
+COPY docker/dev/supervisor /etc/supervisor
+COPY docker/dev/entrypoint-prd.sh /usr/local/bin/entrypoint-prd.sh
+COPY docker/dev/entrypoint-dev-api.sh /usr/local/bin/entrypoint-dev-api.sh
+COPY docker/dev/entrypoint-dev-front.sh /usr/local/bin/entrypoint-dev-front.sh
+
 ENTRYPOINT []
 
 CMD ["/bin/bash"]
