@@ -39,12 +39,12 @@ APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
 
 AWS_PROFILE="default"
 AWS_REGION="ap-northeast-1"
-BUILD_OPTIONS=
+PROXY=
 SLS_ARGS=()
 while [ "$#" != 0 ]; do
   case $1 in
     -h | --help ) usage;;
-    --proxy     ) BUILD_OPTIONS="$BUILD_OPTIONS --build-arg proxy=$proxy --build-arg no_proxy=$no_proxy";;
+    --proxy     ) PROXY="1";;
     --profile   ) shift;AWS_PROFILE="$1";;
     --region    ) shift;AWS_REGION="$1";;
     --          ) shift; SLS_ARGS+=($@); break;;
@@ -53,19 +53,33 @@ while [ "$#" != 0 ]; do
   shift
 done
 
+set -e
+
+# イメージビルド
 BUILD_OPTIONS="$BUILD_OPTIONS --build-arg host_uid=$(id -u)"
 BUILD_OPTIONS="$BUILD_OPTIONS --build-arg host_gid=$(id -g)"
-AWS_ACCESS_KEY_ID=$(aws --profile $AWS_PROFILE --region $AWS_REGION configure get aws_access_key_id)
-AWS_SECRET_ACCESS_KEY=$(aws --profile $AWS_PROFILE --region $AWS_REGION configure get aws_secret_access_key)
-
+if [ -n "$PROXY" ]; then
+  BUILD_OPTIONS="$BUILD_OPTIONS --build-arg proxy=$proxy --build-arg no_proxy=$no_proxy"
+fi
 invoke docker build $BUILD_OPTIONS -q --rm -f docker/sls/Dockerfile -t ${APP_NAME}/sls:latest .
 
-#!/bin/bash
-PROJECT_ROOT=$(cd $(dirname $0)/..; pwd)
+# 環境変数ファイル生成
+env_tmp="$(mktemp)"
+trap "rm $env_tmp" EXIT
+AWS_ACCESS_KEY_ID=$(aws --profile $AWS_PROFILE --region $AWS_REGION configure get aws_access_key_id)
+AWS_SECRET_ACCESS_KEY=$(aws --profile $AWS_PROFILE --region $AWS_REGION configure get aws_secret_access_key)
+echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$env_tmp"
+echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$env_tmp"
+if [ -n "$PROXY" ]; then
+  echo "http_proxy=$proxy" >> "$env_tmp"
+  echo "https_proxy=$proxy" >> "$env_tmp"
+  echo "NO_PROXY=$no_proxy" >> "$env_tmp"
+fi
+
+# slsコマンド実行
 invoke docker run -ti --rm \
   --user app \
-  -e "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" \
-  -e "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" \
+  --env-file "$env_tmp" \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ${HOME}/.cache:/home/app/.cache \
   -v ${PROJECT_ROOT}/sls/serverless.yml:/opt/sls/serverless.yml \
