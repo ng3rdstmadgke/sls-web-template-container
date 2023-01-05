@@ -26,6 +26,8 @@ slsコマンド
     $0 -- info --stage dev
   削除
     $0 -- remove --stage dev
+  プラグインインストール
+    $0 -- plugin install  -n serverless-python-requirements --stage dev
 EOF
 exit 1
 }
@@ -60,13 +62,15 @@ invoke docker build $BUILD_OPTIONS -q --rm -f docker/sls/Dockerfile -t ${APP_NAM
 
 #!/bin/bash
 PROJECT_ROOT=$(cd $(dirname $0)/..; pwd)
-#  -v ${HOME}/.aws:/root/.aws:ro \
 invoke docker run -ti --rm \
   --user app \
   -e "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" \
   -e "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ${HOME}/.cache:/home/app/.cache \
-  -v ${PROJECT_ROOT}/sls:/opt/sls \
+  -v ${PROJECT_ROOT}/sls/serverless.yml:/opt/sls/serverless.yml \
+  -v ${PROJECT_ROOT}/sls/profile:/opt/sls/profile \
+  -v ${PROJECT_ROOT}/sls/package.json:/opt/sls/package.json \
+  -v ${PROJECT_ROOT}/sls/package-lock.json:/opt/sls/package-lock.json \
   ${APP_NAME}/sls:latest \
   sls ${SLS_ARGS[@]}
