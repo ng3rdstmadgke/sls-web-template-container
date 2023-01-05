@@ -5,8 +5,6 @@
   - Secrets Manager
     - RDSの接続情報
     - JWTの秘密鍵
-- slsコマンドコンテナ化
-  - devコンテナに組み込む
 
 # インストール
 
@@ -34,20 +32,20 @@ npm install
 ```bash
 STAGE_NAME=mi1
 
-# /sls-web-template/lambda/ステージ名 で ECR リポジトリ作成
+# ${APP_NAME}/lambda/ステージ名 で ECR リポジトリ作成
 
 # イメージのビルドとpush
 ./bin/push-image.sh -s $STAGE_NAME
 
 # プロファイル作成
-cp ./profile/sample.yml ./profile/${STAGE_NAME}.yml
-vim ./profile/${STAGE_NAME}.yml
+cp ./sls/profile/sample.yml ./sls/profile/${STAGE_NAME}.yml
+vim ./sls/profile/${STAGE_NAME}.yml
 
 # デプロイ
-sls deploy --stage ${STAGE_NAME}
+./bin/sls -- deploy --stage ${STAGE_NAME}
 
 # 削除
-sls remove --stage ${STAGE_NAME}
+./bin/sls -- remove --stage ${STAGE_NAME}
 ```
 
 # 開発環境

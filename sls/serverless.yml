@@ -7,7 +7,7 @@ provider:
   name: aws
   runtime: provided
   stage: ${opt:stage, self:custom.profile.stage, "dev"}
-  profile: ${self:custom.profile.awsProfile}
+  #profile: ${self:custom.profile.awsProfile}
   region: ${self:custom.profile.awsRegion}
   deploymentBucket: ${self:custom.profile.deploymentBucket}
   vpc:
