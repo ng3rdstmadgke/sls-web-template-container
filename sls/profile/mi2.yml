@@ -5,7 +5,6 @@ subnetIds:
   - subnet-015c06f1c967d4bfd
   - subnet-0d43a2957b67e28bb
 vpcEndpointId: vpce-011ae5097f6246470
-awsProfile: ""
 awsRegion: "ap-northeast-1"
 deploymentBucket: "sls-deploy-gcappr58"
 apiEnvironment:

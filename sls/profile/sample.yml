@@ -7,7 +7,6 @@ subnetIds:
 # APIGatewayでプライベートAPIを作成するためのVPCエンドポイントです
 # https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-private-apis.html
 vpcEndpointId: vpce-xxxxxxxxxxxxxxxxx
-awsProfile: ""
 awsRegion: "ap-northeast-1"
 deploymentBucket: xxxxxxxxxxxxxxxxx
 apiEnvironment:
