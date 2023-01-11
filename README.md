@@ -29,9 +29,65 @@ npm install
 
 # デプロイ
 
+## terraformデプロイ
 ```bash
-STAGE_NAME=mi1
+STAGE_NAME=dev
 
+# terraformのプロジェクト作成
+cp -r terraform/stage/mi1 terraform/stage/$STAGE_NAME
+
+# シークレットファイル作成
+cp terraform/stage/$STAGE_NAME/secrets.auto.tfvars.sample terraform/stage/$STAGE_NAME/secrets.auto.tfvars
+
+# シークレット情報の定義
+vim terraform/stage/$STAGE_NAME/secrets.auto.tfvars
+
+# エントリーポイントの設定を変更
+#   変更が必要な項目
+#   - terraform.backend.s3.bucket
+#   - terraform.backend.s3.key
+#   - locals配下の変数
+vim terraform/stage/$STAGE_NAME/main.tf
+
+# 変更をコミット
+
+# terraformデプロイ
+./bin/terraform.sh -s $STAGE_NAME -- apply
+```
+
+## DBマイグレーション
+
+```bash
+# 開発用コンテナのビルド
+./bin/build.sh
+
+# 環境変数ファイル作成
+cp app/sample.env app/${STAGE_NAME}.env
+vim app/${STAGE_NAME}.env
+
+# 開発用shellにログイン
+./bin/shell.sh -e app/local.env
+
+
+#
+# 以下開発用shell内で実行
+#
+# DB作成
+/opt/app/bin/create-database.sh
+
+# マイグレーション
+/opt/app/bin/alembic.sh upgrade head
+
+# スーパーユーザー作成
+/opt/app/bin/manage.sh create_user admin --superuser
+
+# devコンテナからログアウト
+exit
+```
+
+
+## slsデプロイ
+```bash
 # ${APP_NAME}/lambda/ステージ名 で ECR リポジトリ作成
 
 # イメージのビルドとpush
@@ -42,10 +98,10 @@ cp ./sls/profile/sample.yml ./sls/profile/${STAGE_NAME}.yml
 vim ./sls/profile/${STAGE_NAME}.yml
 
 # デプロイ
-./bin/sls -- deploy --stage ${STAGE_NAME}
+./bin/sls.sh -- deploy --stage ${STAGE_NAME}
 
 # 削除
-./bin/sls -- remove --stage ${STAGE_NAME}
+./bin/sls.sh -- remove --stage ${STAGE_NAME}
 ```
 
 # 開発環境

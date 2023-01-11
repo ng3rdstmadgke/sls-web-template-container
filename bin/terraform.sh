@@ -24,6 +24,14 @@ terraformコマンド
     $0 --stage dev -- -help
   初期化
     $0 --stage dev -- init
+  環境とソースコードの差分を確認
+    $0 --stage dev -- plan
+  デプロイ
+    $0 --stage dev -- apply
+  削除
+    $0 --stage dev -- destroy
+  出力を表示
+    $0 --stage dev -- output
 EOF
 exit 1
 }
@@ -80,7 +88,7 @@ fi
 invoke docker run -ti --rm \
   --env-file "$env_tmp" \
   --user app \
-  -w /terraform \
-  -v ${PROJECT_ROOT}/terraform/stage/$STAGE:/terraform \
+  -w /terraform/stage/$STAGE \
+  -v ${PROJECT_ROOT}/terraform:/terraform \
   ${APP_NAME}/terraform:latest \
   ${TERRAFORM_ARGS[@]}
