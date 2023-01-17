@@ -3,8 +3,9 @@ variable "app_name" {}
 variable "stage" {}
 variable "secret_key" {}
 
-resource "aws_secretsmanager_secret" "hash_secret" {
-  name = "/${var.app_name}/${var.stage}/hash"
+resource "aws_secretsmanager_secret" "jwt_secret" {
+  name = "/${var.app_name}/${var.stage}/jwt"
+  recovery_window_in_days = 0
   force_overwrite_replica_secret = true
 }
 

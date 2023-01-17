@@ -8,8 +8,12 @@ variable "db_name" {}
 variable "db_user" {}
 variable "db_password" {}
 
-output "db_endpoint" {
-  value = aws_db_instance.app_db.endpoint
+output "db_host" {
+  value = aws_db_instance.app_db.address
+}
+
+output "db_port" {
+  value = aws_db_instance.app_db.port
 }
 
 #
@@ -104,7 +108,8 @@ resource "aws_db_instance" "app_db" {
 #
 resource "aws_secretsmanager_secret" "app_db_secret" {
   name = "/${var.app_name}/${var.stage}/db"
-  force_overwrite_replica_secret = false
+  recovery_window_in_days = 0
+  force_overwrite_replica_secret = true
 
 }
 
@@ -113,6 +118,7 @@ resource "aws_secretsmanager_secret_version" "app_db_secret_version" {
   secret_string = jsonencode({
     db_user = var.db_user
     db_password = var.db_password
-    db_endpoint = aws_db_instance.app_db.endpoint
+    db_host = aws_db_instance.app_db.address
+    db_port = aws_db_instance.app_db.port
   })
 }

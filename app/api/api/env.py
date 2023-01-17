@@ -6,7 +6,7 @@ class Mode(str, enum.Enum):
     PRD = "prd"
     STG = "stg"
     DEV = "dev"
-    TEST = "test"
+    LOCAL = "local"
 
 class Environment(BaseSettings):
     """環境変数を定義する構造体。
@@ -16,14 +16,8 @@ class Environment(BaseSettings):
     aws_region: str
     api_gateway_base_path: str = ""
     mode: Mode
-    db_dialect: str
-    db_driver: str
-    db_user: str
-    db_password: str
-    db_host: str
-    db_port: str
-    db_name: str
-    secret_key : str
+    db_secret_name: str
+    jwt_secret_name: str
 
 @lru_cache
 def get_env() -> Environment:

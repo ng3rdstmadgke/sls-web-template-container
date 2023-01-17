@@ -28,7 +28,6 @@ APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
 
 OPTIONS=
 DAEMON=
-ENV_PATH="${PROJECT_ROOT}/app/local.env"
 args=()
 while [ "$#" != 0 ]; do
   case $1 in
@@ -41,11 +40,15 @@ while [ "$#" != 0 ]; do
 done
 
 [ "${#args[@]}" != 0 ] && usage
-[ -r "$ENV_PATH" -a -f "$ENV_PATH" ] || error "環境変数ファイルが見つかりません: $ENV_PATH"
-
 
 env_tmp="$(mktemp)"
-cat "$ENV_PATH" > "$env_tmp"
+cat > $env_tmp <<EOF
+MYSQL_USER=test_admin
+MYSQL_PASSWORD=admin1234
+MYSQL_DATABASE=app
+MYSQL_ROOT_PASSWORD=root1234
+EOF
+cat $env_tmp
 
 set -e
 trap 'rm $env_tmp' EXIT
@@ -53,6 +56,7 @@ export $(cat $env_tmp | grep -v -e "^ *#.*")
 
 
 cd "$CONTAINER_DIR"
+
 invoke docker rm -f ${APP_NAME}-mysql
 if [ -n "$DAEMON" ]; then
   invoke docker run $OPTIONS \
@@ -60,10 +64,7 @@ if [ -n "$DAEMON" ]; then
     --rm \
     --name ${APP_NAME}-mysql \
     --network host \
-    -e MYSQL_ROOT_PASSWORD=$DB_PASSWORD \
-    -e MYSQL_USER=$DB_USER \
-    -e MYSQL_PASSWORD=$DB_PASSWORD \
-    -e MYSQL_DATABASE=$DB_NAME \
+    --env-file "$env_tmp" \
     "${APP_NAME}/mysql:latest"
   invoke docker run \
     --rm \
@@ -78,9 +79,6 @@ else
     --rm \
     --name ${APP_NAME}-mysql \
     --network host \
-    -e MYSQL_ROOT_PASSWORD=$DB_PASSWORD \
-    -e MYSQL_USER=$DB_USER \
-    -e MYSQL_PASSWORD=$DB_PASSWORD \
-    -e MYSQL_DATABASE=$DB_NAME \
+    --env-file "$env_tmp" \
     "${APP_NAME}/mysql:latest"
 fi

@@ -23,8 +23,12 @@ provider "aws" {
 variable "db_user" {}
 variable "db_password" {}
 
-output "db_endpoint" {
-  value = module.storage.db_endpoint
+output "db_host" {
+  value = module.storage.db_host
+}
+
+output "db_port" {
+  value = module.storage.db_port
 }
 
 locals {

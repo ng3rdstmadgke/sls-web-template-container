@@ -14,10 +14,11 @@ from .models.user import User
 from .schemas.token import (
     TokenDataSchema
 )
+from .utils import Utils
 from .logger import logger
 import traceback
 
-SECRET_KEY = get_env().secret_key
+SECRET_KEY = Utils.get_jwt_secret().secret_key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
