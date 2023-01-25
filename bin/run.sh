@@ -10,13 +10,11 @@ cat >&2 <<EOS
 [options]
  -h | --help:
    ヘルプを表示
- -d | --daemon:
-   バックグラウンドで起動
  -e | --env-file <ENV_PATH>:
    apiコンテナ用の環境変数ファイルを指定(default=.env)
  --debug:
    デバッグモードで起動
- --profile <AWS_PROFILE>:
+ II--profile <AWS_PROFILE>:
    awsのプロファイル名を指定 例) default
  --region <AWS_REGION>:
    awsのリージョンを指定 例) ap-northeast-1
@@ -46,7 +44,6 @@ exit 1
 PROJECT_ROOT="$(cd $(dirname $0)/..; pwd)"
 source "${PROJECT_ROOT}/bin/lib/utils.sh"
 
-RUN_OPTIONS=
 ENV_PATH=
 AWS_PROFILE_OPTION=
 AWS_REGION_OPTION=
@@ -56,7 +53,6 @@ args=()
 while [ "$#" != 0 ]; do
   case $1 in
     -h | --help      ) usage;;
-    -d | --daemon    ) RUN_OPTIONS="$RUN_OPTIONS -d";;
     -e | --env-file  ) shift;ENV_PATH="$1";;
     --debug          ) DEBUG="1";;
     --profile        ) shift;AWS_PROFILE_OPTION="--profile $1";;
