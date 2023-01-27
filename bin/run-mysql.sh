@@ -12,30 +12,23 @@ mysqlコンテナ起動コマンド
 [options]
  -h | --help:
    ヘルプを表示
- -d | --daemon:
-   バックグラウンドで起動
 EOS
 exit 1
 }
 
 SCRIPT_DIR="$(cd $(dirname $0); pwd)"
 PROJECT_ROOT="$(cd ${SCRIPT_DIR}/..; pwd)"
-API_DIR="$(cd ${PROJECT_ROOT}/api; pwd)"
 CONTAINER_DIR="$(cd ${PROJECT_ROOT}/docker; pwd)"
-BIN_DIR="$(cd ${PROJECT_ROOT}/bin; pwd)"
 
 source "${SCRIPT_DIR}/lib/utils.sh"
 
 APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
 
 OPTIONS=
-DAEMON=
-ENV_PATH="${PROJECT_ROOT}/local.env"
 args=()
 while [ "$#" != 0 ]; do
   case $1 in
     -h | --help   ) usage;;
-    -d | --daemon ) shift;DAEMON=1;;
     -* | --*      ) error "$1 : 不正なオプションです" ;;
     *             ) args+=("$1");;
   esac
@@ -43,11 +36,15 @@ while [ "$#" != 0 ]; do
 done
 
 [ "${#args[@]}" != 0 ] && usage
-[ -r "$ENV_PATH" -a -f "$ENV_PATH" ] || error "環境変数ファイルが見つかりません: $ENV_PATH"
-
 
 env_tmp="$(mktemp)"
-cat "$ENV_PATH" > "$env_tmp"
+cat > $env_tmp <<EOF
+MYSQL_USER=test_admin
+MYSQL_PASSWORD=admin1234
+MYSQL_DATABASE=app
+MYSQL_ROOT_PASSWORD=root1234
+EOF
+cat $env_tmp
 
 set -e
 trap 'rm $env_tmp' EXIT
@@ -55,34 +52,19 @@ export $(cat $env_tmp | grep -v -e "^ *#.*")
 
 
 cd "$CONTAINER_DIR"
-if [ -n "$DAEMON" ]; then
-  invoke docker run $OPTIONS \
-    -d \
-    --rm \
-    --name ${APP_NAME}-mysql \
-    --network host \
-    -e MYSQL_ROOT_PASSWORD=$DB_PASSWORD \
-    -e MYSQL_USER=$DB_USER \
-    -e MYSQL_PASSWORD=$DB_PASSWORD \
-    -e MYSQL_DATABASE=$DB_NAME \
-    "${APP_NAME}/mysql:latest"
-  invoke docker run \
-    --rm \
-    --name ${APP_NAME}-mysql-check \
-    --env-file "$env_tmp" \
-    --network host \
-    -v "${PROJECT_ROOT}:/opt/app" \
-    "${APP_NAME}/api:latest" \
-    /opt/app/bin/lib/check-mysql-boot.sh
-else
-  invoke docker run $OPTIONS \
-    -ti \
-    --rm \
-    --name ${APP_NAME}-mysql \
-    --network host \
-    -e MYSQL_ROOT_PASSWORD=$DB_PASSWORD \
-    -e MYSQL_USER=$DB_USER \
-    -e MYSQL_PASSWORD=$DB_PASSWORD \
-    -e MYSQL_DATABASE=$DB_NAME \
-    "${APP_NAME}/mysql:latest"
-fi
+
+invoke docker rm -f ${APP_NAME}-mysql
+invoke docker run $OPTIONS \
+  -d \
+  --rm \
+  --name ${APP_NAME}-mysql \
+  --network host \
+  --env-file "$env_tmp" \
+  "${APP_NAME}/mysql:latest"
+invoke docker run \
+  --rm \
+  --name ${APP_NAME}-mysql-check \
+  --env-file "$env_tmp" \
+  --network host \
+  "${APP_NAME}/mysql:latest" \
+  /usr/local/bin/check-mysql-boot.sh

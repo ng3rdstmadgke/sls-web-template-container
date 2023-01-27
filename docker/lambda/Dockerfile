@@ -17,11 +17,11 @@ RUN curl -fsSL https://rpm.nodesource.com/setup_lts.x | bash -
 RUN yum install -y nodejs
 
 # pip install
-COPY requirements.txt .
+COPY app/requirements.txt .
 RUN  pip3 install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
 # nuxt generate
-COPY front ${LAMBDA_TASK_ROOT}/front
+COPY app/front ${LAMBDA_TASK_ROOT}/front
 RUN cd ${LAMBDA_TASK_ROOT}/front && \
     npm update -g npm && \
     npm install
@@ -32,6 +32,6 @@ RUN cd ${LAMBDA_TASK_ROOT}/front && \
     npm run generate
 
 # copy api source
-COPY api ${LAMBDA_TASK_ROOT}/api
+COPY app/api ${LAMBDA_TASK_ROOT}/api
 
 CMD ["api.main.handler"]

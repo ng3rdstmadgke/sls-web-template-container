@@ -5,8 +5,6 @@
   - Secrets Manager
     - RDSの接続情報
     - JWTの秘密鍵
-- slsコマンドコンテナ化
-  - devコンテナに組み込む
 
 # インストール
 
@@ -31,23 +29,78 @@ npm install
 
 # デプロイ
 
+## terraformデプロイ
 ```bash
-STAGE_NAME=mi1
+STAGE_NAME=dev
 
-# /sls-web-template/lambda/ステージ名 で ECR リポジトリ作成
+# terraformのプロジェクト作成
+cp -r terraform/stage/mi1 terraform/stage/$STAGE_NAME
+
+# シークレットファイル作成
+cp terraform/stage/$STAGE_NAME/secrets.auto.tfvars.sample terraform/stage/$STAGE_NAME/secrets.auto.tfvars
+
+# シークレット情報の定義
+vim terraform/stage/$STAGE_NAME/secrets.auto.tfvars
+
+# エントリーポイントの設定を変更
+#   変更が必要な項目
+#   - terraform.backend.s3.bucket
+#   - terraform.backend.s3.key
+#   - locals配下の変数
+vim terraform/stage/$STAGE_NAME/main.tf
+
+# 変更をコミット
+
+# terraformデプロイ
+./bin/terraform.sh -s $STAGE_NAME -- apply
+```
+
+## DBマイグレーション
+
+```bash
+# 開発用コンテナのビルド
+./bin/build.sh
+
+# 環境変数ファイル作成
+cp app/sample.env app/${STAGE_NAME}.env
+vim app/${STAGE_NAME}.env
+
+# 開発用shellにログイン
+./bin/shell.sh -e 環境変数ファイル名
+
+#
+# 以下開発用shell内で実行
+#
+# DB作成
+./bin/create-database.sh
+
+# マイグレーション
+(cd api; alembic upgrade head)
+
+# スーパーユーザー作成
+./bin/manage.sh create_user admin --superuser
+
+# devコンテナからログアウト
+exit
+```
+
+
+## slsデプロイ
+```bash
+# ${APP_NAME}/lambda/ステージ名 で ECR リポジトリ作成
 
 # イメージのビルドとpush
 ./bin/push-image.sh -s $STAGE_NAME
 
 # プロファイル作成
-cp ./profile/sample.yml ./profile/${STAGE_NAME}.yml
-vim ./profile/${STAGE_NAME}.yml
+cp ./sls/profile/sample.yml ./sls/profile/${STAGE_NAME}.yml
+vim ./sls/profile/${STAGE_NAME}.yml
 
 # デプロイ
-sls deploy --stage ${STAGE_NAME}
+./bin/sls.sh -- deploy --stage ${STAGE_NAME}
 
 # 削除
-sls remove --stage ${STAGE_NAME}
+./bin/sls.sh -- remove --stage ${STAGE_NAME}
 ```
 
 # 開発環境
@@ -67,20 +120,20 @@ sls remove --stage ${STAGE_NAME}
 
 ```bash
 # devコンテナ起動
-./bin/shell.sh -e local.env
+./bin/shell.sh -e app/local.env
 ```
 
 devコンテナ内での操作
 
 ```bash
 # DB作成
-/opt/app/bin/lib/create-database.sh
+/opt/app/bin/create-database.sh
 
 # マイグレーション
-/opt/app/bin/lib/alembic.sh upgrade head
+alembic upgrade head
 
 # スーパーユーザー作成
-/opt/app/bin/lib/manage.sh create_user admin --superuser
+/opt/app/bin/manage.sh create_user admin --superuser
 
 # devコンテナからログアウト
 exit
@@ -90,10 +143,10 @@ exit
 
 ```bash
 # アプリ起動 (開発モード)
-./bin/run.sh --debug -e local.env
+./bin/run.sh --debug -e app/local.env
 
 # アプリ起動 (本番モード)
-./bin/run.sh -e local.env
+./bin/run.sh -e app/local.env
 
 # アクセス
 # http://localhost:3000/
@@ -110,14 +163,14 @@ exit
 ./bin/run-mysql.sh -d
 
 # devコンテナ起動
-./bin/shell.sh -e local.env
+./bin/shell.sh -e app/local.env
 ```
 
 devコンテナ内での操作
 
 ```bash
 # テスト実行
-./bin/lib/test.sh
+./bin/test.sh
 ```
 
 # 運用
@@ -136,48 +189,50 @@ devコンテナ内での操作
 ## マイグレーション(devコンテナ内での操作)
 
 ```bash
+cd api
+
 # DB作成
-./bin/lib/create-database.sh
+./bin/create-database.sh
 
 # マイグレーション: 履歴確認
-./bin/lib/alembic.sh history -v
+alembic history -v
 
 # マイグレーション: 最新バージョンにアップグレード
-./bin/lib/alembic.sh upgrade head
+alembic upgrade head
 
 # マイグレーション: 次のバージョンにアップグレード
-./bin/lib/alembic.sh upgrade +1
+alembic upgrade +1
 
 # マイグレーション: 最初のバージョンにダウングレード
-./bin/lib/alembic.sh downgrade base
+alembic downgrade base
 
 # マイグレーション: 次のバージョンにダウングレード
-./bin/lib/alembic.sh downgrade -1
+alembic downgrade -1
 
 # マイグレーション: マイグレーションファイル生成
-./bin/lib/alembic.sh revision --autogenerate -m "message"
+alembic revision --autogenerate -m "message"
 ```
 
 ## DBログイン(devコンテナ内での操作)
 
 ```bash
 # DB作成
-./bin/lib/create-database.sh
+./bin/create-database.sh
 
 # mysql ログイン
-./bin/lib/mysql.sh
+./bin/mysql.sh
 ```
 
 ## マネジメントコマンド(devコンテナ内での操作)
 
 ```bash
 # ヘルプ
-./bin/lib/manage.sh
+./bin/manage.sh
 
 # スーパーユーザー作成
-./bin/lib/manage.sh create_user admin --superuser
+./bin/manage.sh create_user admin --superuser
 
 # 通常ユーザー作成
-./bin/lib/manage.sh create_user user1
-./bin/lib/manage.sh create_user user2
+./bin/manage.sh create_user user1
+./bin/manage.sh create_user user2
 ```

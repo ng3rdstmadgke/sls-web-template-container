@@ -44,17 +44,18 @@ WORKDIR /opt/app
 RUN pip install supervisor
 
 # pip install
-COPY requirements.txt .
+COPY app/requirements.txt .
 RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
 
 # npm install
-COPY front front
+COPY app/front front
 RUN cd /opt/app/front && \
   npm update -g npm && \
   npm install && \
   npm run generate
 
-COPY . .
+COPY app/api api
+COPY app/bin bin
 
 RUN groupadd -g 13567 sysadmin && echo "%sysadmin ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/sysadmin
 
@@ -63,6 +64,15 @@ RUN groupadd -g $host_gid app && \
     usermod -aG sysadmin app
 
 RUN chown -R app:app /opt
+
+# supervisorの設定ファイルとコンテナのエントリーポイント
+COPY docker/dev/supervisor /etc/supervisor
+COPY docker/dev/entrypoint-prd.sh /usr/local/bin/entrypoint-prd.sh
+COPY docker/dev/entrypoint-dev-api.sh /usr/local/bin/entrypoint-dev-api.sh
+COPY docker/dev/entrypoint-dev-front.sh /usr/local/bin/entrypoint-dev-front.sh
+
+# importの起点となるパスを環境変数として定義
+ENV PYTHONPATH=/opt/app
 
 ENTRYPOINT []
 

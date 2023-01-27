@@ -1,0 +1,16 @@
+releaseTag: latest
+securityGroupIds:
+  - sg-xxxxxxxxxxxxxxxxx
+subnetIds:
+  - subnet-xxxxxxxxxxxxxxxxx
+  - subnet-xxxxxxxxxxxxxxxxx
+# APIGatewayでプライベートAPIを作成するためのVPCエンドポイントです
+# https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-private-apis.html
+vpcEndpointId: vpce-xxxxxxxxxxxxxxxxx
+awsRegion: "ap-northeast-1"
+deploymentBucket: xxxxxxxxxxxxxxxxx
+apiEnvironment:
+  API_GATEWAY_BASE_PATH: "/sample"
+  MODE: dev
+  DB_SECRET_NAME: "/xxxxx/sample/db"
+  JWT_SECRET_NAME: "/xxxxx/sample/jwt"

@@ -1,0 +1,14 @@
+releaseTag: latest
+securityGroupIds:
+  - sg-0d75885fd07e9ebd0
+subnetIds:
+  - subnet-015c06f1c967d4bfd
+  - subnet-0d43a2957b67e28bb
+vpcEndpointId: vpce-02b55530ae32a07ad
+awsRegion: "ap-northeast-1"
+deploymentBucket: "sls-deploy-gcappr58"
+apiEnvironment:
+  API_GATEWAY_BASE_PATH: "/mi1"
+  MODE: dev
+  DB_SECRET_NAME: "/sls-web-template-container/mi1/db"
+  JWT_SECRET_NAME: "/sls-web-template-container/mi1/jwt"
