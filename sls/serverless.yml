@@ -100,3 +100,9 @@ resources:
                   Action:
                     - "dynamodb:*"
                     - "dax:*"
+                - Resource: "*"
+                  Effect: Allow
+                  Action:
+                    - "secretsmanager:Get*"
+                    - "secretsmanager:List*"
+                    - "secretsmanager:Describe*"
