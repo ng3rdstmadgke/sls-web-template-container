@@ -4,8 +4,8 @@ import boto3
 from functools import lru_cache
 from pydantic import BaseModel
 
-from .env import get_env
-from .logger import logger
+from api.env import get_env
+from api.lib.logger import logger
 
 """
 SecretsManagerに格納されているSecretsStringを構造体として取得するための関数

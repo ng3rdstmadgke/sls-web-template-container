@@ -2,11 +2,13 @@ import time
 import boto3
 import json
 from typing import Dict
-import boto3
 from functools import lru_cache
+
+import boto3
 from pydantic import BaseModel
-from .env import get_env, Mode, Environment
-from .logger import logger
+
+from api.env import get_env, Mode, Environment
+from api.lib.logger import logger
 
 class RdsSecret(BaseModel):
     db_user: str

@@ -1,4 +1,4 @@
-import os
+import traceback
 from typing import Optional
 from datetime import datetime, timedelta
 
@@ -8,15 +8,11 @@ from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 
-from .env import get_env
-from .db import db
-from .models.user import User
-from .schemas.token import (
-    TokenDataSchema
-)
-from .utils import Utils
-from .logger import logger
-import traceback
+from api import session
+from api.models import User
+from api.schemas.token import TokenDataSchema
+from api.lib.utils import Utils
+from api.lib.logger import logger
 
 SECRET_KEY = Utils.get_jwt_secret().secret_key
 ALGORITHM = "HS256"
@@ -76,12 +72,12 @@ def create_access_token(payload: dict, expires_delta: Optional[timedelta] = None
     return encoded_jwt
 
 
-def get_current_user(db: Session = Depends(db.get_db), token: str = Depends(oauth2_scheme)) -> User:
+def get_current_user(session: Session = Depends(session.get_session), token: str = Depends(oauth2_scheme)) -> User:
     """JWTの署名検証を行い、subに格納されているusernameからUserオブジェクトを取得する
     引数のtokenには "/api/v1/token" でリターンした access_token が格納されている
 
     Args:
-        db (Session, optional): dbセッション
+        session (Session, optional): dbセッション
         token (str, optional): エンコード済みJWT
 
     Raises:
@@ -104,7 +100,7 @@ def get_current_user(db: Session = Depends(db.get_db), token: str = Depends(oaut
     except JWTError:
         logger.warning(traceback.format_exc())
         raise credentials_exception
-    user = db.query(User).filter(User.username == username).first()
+    user = session.query(User).filter(User.username == username).first()
     if user is None:
         logger.info(f"user not exists in DB (username={username})")
         raise credentials_exception

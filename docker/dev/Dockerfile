@@ -71,6 +71,9 @@ COPY docker/dev/entrypoint-prd.sh /usr/local/bin/entrypoint-prd.sh
 COPY docker/dev/entrypoint-dev-api.sh /usr/local/bin/entrypoint-dev-api.sh
 COPY docker/dev/entrypoint-dev-front.sh /usr/local/bin/entrypoint-dev-front.sh
 
+# importの起点となるパスを環境変数として定義
+ENV PYTHONPATH=/opt/app
+
 ENTRYPOINT []
 
 CMD ["/bin/bash"]

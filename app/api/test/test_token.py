@@ -2,11 +2,12 @@ from fastapi.testclient import TestClient
 from jose import jwt
 import pytest
 
-from ..main import app
-from ..api.db.base import Base
-from ..api.db.db import engine, SessionLocal
-from .lib import utils as test_utils
-from ..api.env import get_env
+from api.main import app
+from api.models import Base
+from api.session import engine, SessionLocal
+from api.lib.secrets import get_jwt_secret
+from api.test.lib import utils as test_utils
+from api.env import get_env
 
 Base.metadata.drop_all(bind=engine)
 
@@ -30,7 +31,7 @@ def test_create_token():
     assert response.status_code == 200
     body = response.json()
     assert body["token_type"] == "bearer"
-    secret_key = get_env().secret_key
+    secret_key = get_jwt_secret().secret_key
     payload = jwt.decode(body["access_token" ], secret_key, algorithms=["HS256"])
     assert payload["sub"] == "admin"
     assert payload["scopes"] == []

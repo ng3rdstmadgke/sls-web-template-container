@@ -1,12 +1,10 @@
 from typing import List, Dict, Any
-from sqlalchemy.orm import sessionmaker
 from functools import lru_cache
 
 from fastapi.testclient import TestClient
-from ...api.schemas.user import UserCreateSchema
-from ...api.cruds import (
-    user as crud_user,
-)
+
+from api.schemas.user import UserCreateSchema
+from api.crud import user as crud_user
 
 
 @lru_cache()

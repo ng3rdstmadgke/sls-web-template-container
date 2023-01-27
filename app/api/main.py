@@ -8,9 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from api.api.db import db
-from api.api.routers import item, token, user
-from api.api.env import get_env, Mode
+from api import session
+from api.routers import item, token, user
+from api.env import get_env, Mode
 
 if get_env().mode == Mode.PRD:
     app = FastAPI(
@@ -45,10 +45,10 @@ app.include_router(token.router, prefix="/api/v1")
 
 @app.get("/api/healthcheck")
 async def healthcheck(
-    db: Session = Depends(db.get_db),
+    session: Session = Depends(session.get_session),
 ):
     stmt = text(f"SELECT 'healthy' as message")
-    row = db.execute(stmt).first()
+    row = session.execute(stmt).first()
     return {"message": row.message}
 
 

@@ -7,18 +7,14 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, APIRouter, HTTPException, Form, File, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 
-from .. import auth
-from ..db import db
-from ..env import get_env
-from ..utils import Utils
-from ..logger import logger, logging_error_exception, logging_warn_exception
-from ..models.user import User
-from ..cruds import item as crud_item
-from ..schemas.item import (
-    ItemSchema,
-    ItemSchemaWithoutContent,
-    DataFormat,
-)
+from api import session
+from api.lib import auth
+from api.env import get_env
+from api.lib.utils import Utils
+from api.lib.logger import logger, logging_error_exception, logging_warn_exception
+from api.models import User, ItemDataFormat
+from api.crud import item as crud_item
+from api.schemas.item import ItemSchema, ItemSchemaWithoutContent
 
 
 @lru_cache
@@ -37,15 +33,15 @@ async def create(
     name: str = Form(...),
     file: UploadFile = File(...),
     is_common: bool = Form(...),
-    data_format: DataFormat = Form(...),
+    data_format: ItemDataFormat = Form(...),
     _s3_client = Depends(s3_client_factory),
-    db: Session = Depends(db.get_db),
+    session: Session = Depends(session.get_session),
     current_user: User = Depends(auth.get_current_active_user)
 ):
     content = await file.read()
     try:
         item = crud_item.create(
-            db,
+            session,
             name=name,
             content=content.decode("utf-8"),
             is_common=is_common,
@@ -63,19 +59,19 @@ async def create(
 def get_list(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(db.get_db),
+    session: Session = Depends(session.get_session),
     current_user: User = Depends(auth.get_current_active_user)
 ):
-    return crud_item.get_list_include_common(db, current_user.id, skip, limit)
+    return crud_item.get_list_include_common(session, current_user.id, skip, limit)
 
 
 @router.get("/items/{item_id}", response_model=ItemSchema)
 def get(
     item_id: int,
-    db: Session = Depends(db.get_db),
+    session: Session = Depends(session.get_session),
     current_user: User = Depends(auth.get_current_active_user)
 ):
-    item = crud_item.get_include_common(db, current_user.id, item_id)
+    item = crud_item.get_include_common(session, current_user.id, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="item not found")
     return item
@@ -86,10 +82,10 @@ def get(
 @router.get("/items/{item_id}/download", response_class=StreamingResponse)
 def download(
     item_id: int,
-    db: Session = Depends(db.get_db),
+    session: Session = Depends(session.get_session),
     current_user: User = Depends(auth.get_current_active_user)
 ):
-    item = crud_item.get_include_common(db, current_user.id, item_id)
+    item = crud_item.get_include_common(session, current_user.id, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="item not found")
     
@@ -114,18 +110,18 @@ async def update(
     name: str = Form(...),
     file: UploadFile = File(...),
     is_common: bool = Form(...),
-    data_format: DataFormat = Form(...),
-    db: Session = Depends(db.get_db),
+    data_format: ItemDataFormat = Form(...),
+    session: Session = Depends(session.get_session),
     current_user: User = Depends(auth.get_current_active_user)
 ):
-    item = crud_item.get(db, current_user.id, item_id)
+    item = crud_item.get(session, current_user.id, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="item not found")
 
     content = await file.read()
     try:
         return crud_item.update(
-            db,
+            session,
             name=name,
             content=content.decode("utf-8"),
             is_common=is_common,
@@ -140,15 +136,15 @@ async def update(
 @router.delete("/items/{item_id}")
 def delete(
     item_id: int,
-    db: Session = Depends(db.get_db),
+    session: Session = Depends(session.get_session),
     current_user: User = Depends(auth.get_current_active_user)
 ):
-    item = crud_item.get(db, current_user.id, item_id)
+    item = crud_item.get(session, current_user.id, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="item not found")
     try:
         crud_item.delete(
-            db,
+            session,
             item=item,
         )
     except Exception as e:

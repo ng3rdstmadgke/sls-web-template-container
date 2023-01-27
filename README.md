@@ -73,13 +73,13 @@ vim app/${STAGE_NAME}.env
 # 以下開発用shell内で実行
 #
 # DB作成
-/opt/app/bin/create-database.sh
+./bin/create-database.sh
 
 # マイグレーション
-/opt/app/bin/alembic.sh upgrade head
+(cd api; alembic upgrade head)
 
 # スーパーユーザー作成
-/opt/app/bin/manage.sh create_user admin --superuser
+./bin/manage.sh create_user admin --superuser
 
 # devコンテナからログアウト
 exit
@@ -131,7 +131,7 @@ devコンテナ内での操作
 /opt/app/bin/create-database.sh
 
 # マイグレーション
-/opt/app/bin/alembic.sh upgrade head
+alembic upgrade head
 
 # スーパーユーザー作成
 /opt/app/bin/manage.sh create_user admin --superuser
@@ -190,26 +190,28 @@ devコンテナ内での操作
 ## マイグレーション(devコンテナ内での操作)
 
 ```bash
+cd api
+
 # DB作成
 ./bin/create-database.sh
 
 # マイグレーション: 履歴確認
-./bin/alembic.sh history -v
+alembic history -v
 
 # マイグレーション: 最新バージョンにアップグレード
-./bin/alembic.sh upgrade head
+alembic upgrade head
 
 # マイグレーション: 次のバージョンにアップグレード
-./bin/alembic.sh upgrade +1
+alembic upgrade +1
 
 # マイグレーション: 最初のバージョンにダウングレード
-./bin/alembic.sh downgrade base
+alembic downgrade base
 
 # マイグレーション: 次のバージョンにダウングレード
-./bin/alembic.sh downgrade -1
+alembic downgrade -1
 
 # マイグレーション: マイグレーションファイル生成
-./bin/alembic.sh revision --autogenerate -m "message"
+alembic revision --autogenerate -m "message"
 ```
 
 ## DBログイン(devコンテナ内での操作)

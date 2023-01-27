@@ -1,17 +1,12 @@
-from typing import Optional
 from pydantic import BaseModel
-import enum
+from api.models import ItemDataFormat
 
-
-class DataFormat(str, enum.Enum):
-    CSV = "CSV",
-    TSV = "TSV"
 
 class ItemSchemaBase(BaseModel):
     id: int
     name: str
     is_common: bool
-    data_format: DataFormat
+    data_format: ItemDataFormat
 
 class ItemSchema(ItemSchemaBase):
     content: str

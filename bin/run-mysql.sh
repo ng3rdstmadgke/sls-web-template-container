@@ -12,8 +12,6 @@ mysqlコンテナ起動コマンド
 [options]
  -h | --help:
    ヘルプを表示
- -d | --daemon:
-   バックグラウンドで起動
 EOS
 exit 1
 }
@@ -27,12 +25,10 @@ source "${SCRIPT_DIR}/lib/utils.sh"
 APP_NAME=$(get_app_name ${PROJECT_ROOT}/app_name)
 
 OPTIONS=
-DAEMON=
 args=()
 while [ "$#" != 0 ]; do
   case $1 in
     -h | --help   ) usage;;
-    -d | --daemon ) shift;DAEMON=1;;
     -* | --*      ) error "$1 : 不正なオプションです" ;;
     *             ) args+=("$1");;
   esac
@@ -58,27 +54,17 @@ export $(cat $env_tmp | grep -v -e "^ *#.*")
 cd "$CONTAINER_DIR"
 
 invoke docker rm -f ${APP_NAME}-mysql
-if [ -n "$DAEMON" ]; then
-  invoke docker run $OPTIONS \
-    -d \
-    --rm \
-    --name ${APP_NAME}-mysql \
-    --network host \
-    --env-file "$env_tmp" \
-    "${APP_NAME}/mysql:latest"
-  invoke docker run \
-    --rm \
-    --name ${APP_NAME}-mysql-check \
-    --env-file "$env_tmp" \
-    --network host \
-    "${APP_NAME}/mysql:latest" \
-    /usr/local/bin/check-mysql-boot.sh
-else
-  invoke docker run $OPTIONS \
-    -ti \
-    --rm \
-    --name ${APP_NAME}-mysql \
-    --network host \
-    --env-file "$env_tmp" \
-    "${APP_NAME}/mysql:latest"
-fi
+invoke docker run $OPTIONS \
+  -d \
+  --rm \
+  --name ${APP_NAME}-mysql \
+  --network host \
+  --env-file "$env_tmp" \
+  "${APP_NAME}/mysql:latest"
+invoke docker run \
+  --rm \
+  --name ${APP_NAME}-mysql-check \
+  --env-file "$env_tmp" \
+  --network host \
+  "${APP_NAME}/mysql:latest" \
+  /usr/local/bin/check-mysql-boot.sh

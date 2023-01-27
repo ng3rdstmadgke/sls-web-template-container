@@ -11,10 +11,10 @@ cat >&2 <<EOS
  -h | --help:
    ヘルプを表示
  -e | --env-file <ENV_PATH>:
-   apiコンテナ用の環境変数ファイルを指定(default=.env)
+   apiコンテナ用の環境変数ファイルを指定 (default=app/local.env)
  --debug:
    デバッグモードで起動
- II--profile <AWS_PROFILE>:
+ --profile <AWS_PROFILE>:
    awsのプロファイル名を指定 例) default
  --region <AWS_REGION>:
    awsのリージョンを指定 例) ap-northeast-1
@@ -27,16 +27,16 @@ cat >&2 <<EOS
    $(dirname $0)/run-mysql.sh -d
 
    # devコンテナ起動
-   $(dirname $0)/shell.sh -e app/local.env
+   $(dirname $0)/shell.sh
 
    # devコンテナ内でマイグレーション (deコンテナでの操作)
-   $ /opt/app/bin/create-database.sh
-   $ /opt/app/bin/alembic.sh upgrade head
-   $ /opt/app/bin/manage.sh create_user admin --superuser
+   $ ./bin/create-database.sh
+   $ alembic upgrade head
+   $ ./bin/manage.sh create_user admin --superuser
    $ exit
 
    # アプリ起動
-   ./bin/run.sh --debug -e app/local.env
+   ./bin/run.sh --debug
 EOS
 exit 1
 }
@@ -44,9 +44,9 @@ exit 1
 PROJECT_ROOT="$(cd $(dirname $0)/..; pwd)"
 source "${PROJECT_ROOT}/bin/lib/utils.sh"
 
-ENV_PATH=
 AWS_PROFILE_OPTION=
 AWS_REGION_OPTION=
+ENV_PATH="${PROJECT_ROOT}/app/local.env"
 PROXY=
 DEBUG=
 args=()
@@ -65,7 +65,6 @@ while [ "$#" != 0 ]; do
 done
 
 [ "${#args[@]}" != 0 ] && usage
-[ -z "$ENV_PATH" ] && error "-e | --env-file で環境変数ファイルを指定してください"
 [ -r "$ENV_PATH" -a -f "$ENV_PATH" ] || error "指定した環境変数ファイルを読み込めません: $ENV_PATH"
 
 env_tmp="$(mktemp)"

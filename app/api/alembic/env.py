@@ -18,14 +18,14 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
-from api.db import base
-target_metadata = base.Base.metadata
+from api.models import Base
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-from api.db import db
+from api import session
 
 
 def run_migrations_offline():
@@ -41,7 +41,7 @@ def run_migrations_offline():
 
     """
     context.configure(
-        url=db.SQLALCHEMY_DATABASE_URL,
+        url=session.SQLALCHEMY_DATABASE_URL,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -60,7 +60,7 @@ def run_migrations_online():
 
     """
     conf = config.get_section(config.config_ini_section)
-    conf["sqlalchemy.url"] = db.SQLALCHEMY_DATABASE_URL
+    conf["sqlalchemy.url"] = session.SQLALCHEMY_DATABASE_URL
     connectable = engine_from_config(
         conf,
         prefix="sqlalchemy.",

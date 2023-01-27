@@ -1,11 +1,10 @@
-from pprint import pprint
 import sys
 from typing import Any, Dict, List
+
 from sqlalchemy.sql import text
-from sqlalchemy import select
 from pydantic import BaseModel
 
-from api.db.db import SessionLocal
+from api.session import SessionLocal
 
 
 class Args(BaseModel):

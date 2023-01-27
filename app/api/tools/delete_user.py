@@ -1,8 +1,10 @@
 import sys
 from typing import Any, Dict, List
-from api.db.db import SessionLocal
-from api.db.base import User
+
 from pydantic import BaseModel
+
+from api.session import SessionLocal
+from api.models import User
 
 class Args(BaseModel):
     user_name: str
