@@ -14,7 +14,6 @@ provider:
     securityGroupIds: ${self:custom.profile.securityGroupIds}
     subnetIds: ${self:custom.profile.subnetIds}
   environment:
-    APP_NAME: ${self:service}
     STAGE_NAME: ${self:provider.stage}
   # APIGatewayでプライベートAPIを作成する
   # https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-private-apis.html

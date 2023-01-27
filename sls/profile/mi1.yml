@@ -10,11 +10,5 @@ deploymentBucket: "sls-deploy-gcappr58"
 apiEnvironment:
   API_GATEWAY_BASE_PATH: "/mi1"
   MODE: dev
-  DB_DIALECT: mysql
-  DB_DRIVER: pymysql
-  DB_USER: TransAppAdmin
-  DB_PASSWORD: Cra=Ebmyk3M5x.nm7I^0khgtiJ.Cqy
-  DB_HOST: "transapp-rds-mi1.cxh1e43zwtop.ap-northeast-1.rds.amazonaws.com"
-  DB_PORT: 3306
-  DB_NAME: sls_web_template
-  SECRET_KEY: cefd95b00b6e319a3c148bf2c93499e20da6d4ad0db4662cae950f1a64182b5e
+  DB_SECRET_NAME: "/sls-web-template-container/mi1/db"
+  JWT_SECRET_NAME: "/sls-web-template-container/mi1/jwt"

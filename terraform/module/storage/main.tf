@@ -34,6 +34,9 @@ resource "aws_security_group" "app_db_sg" {
     protocol = "tcp"
     cidr_blocks = [ "10.0.0.0/8" ]
   }
+  tags = {
+    "Name" = "${var.app_name}-${var.stage}-db"
+  }
 }
 
 resource "aws_db_parameter_group" "app_db_pg" {

@@ -2,16 +2,7 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
-from api.env import get_env
 from api.models import Item, User, ItemDataFormat
-
-def get_item_name(file_id: int) -> str:
-    env = get_env()
-    return "{}-{}-{:0>8}".format(
-        env.app_name,
-        env.stage_name,
-        file_id,
-    )
 
 def get_for_translate(session: Session, user_id: int, item_id: int) -> Optional[Item]:
     return session.query(

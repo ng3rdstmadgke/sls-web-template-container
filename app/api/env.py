@@ -11,9 +11,8 @@ class Mode(str, enum.Enum):
 class Environment(BaseSettings):
     """環境変数を定義する構造体。
     """
-    app_name: str
     stage_name: str
-    aws_region: str
+    aws_region: str = "ap-northeast-1"
     api_gateway_base_path: str = ""
     mode: Mode
     db_secret_name: str

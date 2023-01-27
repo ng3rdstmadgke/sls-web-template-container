@@ -66,8 +66,7 @@ cp app/sample.env app/${STAGE_NAME}.env
 vim app/${STAGE_NAME}.env
 
 # 開発用shellにログイン
-./bin/shell.sh -e app/local.env
-
+./bin/shell.sh -e 環境変数ファイル名
 
 #
 # 以下開発用shell内で実行

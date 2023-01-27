@@ -72,6 +72,7 @@ cat "$ENV_PATH" > "$env_tmp"
 
 AWS_ACCESS_KEY_ID=$(aws $AWS_PROFILE_OPTION $AWS_REGION_OPTION configure get aws_access_key_id)
 AWS_SECRET_ACCESS_KEY=$(aws $AWS_PROFILE_OPTION $AWS_REGION_OPTION configure get aws_secret_access_key)
+echo "" >> "$env_tmp"
 echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$env_tmp"
 echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$env_tmp"
 
