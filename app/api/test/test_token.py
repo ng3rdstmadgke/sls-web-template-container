@@ -5,7 +5,7 @@ import pytest
 from api.main import app
 from api.models import Base
 from api.session import engine, SessionLocal
-from api.lib.secrets import get_jwt_secret
+from api.lib.utils import Utils
 from api.test.lib import utils as test_utils
 from api.env import get_env
 
@@ -26,12 +26,12 @@ def pre_module():
 def test_create_token():
     response = client.post(
         "/api/v1/token",
-        {"username": "admin", "password": "admin1234"}
+        data={"username": "admin", "password": "admin1234"}
     )
     assert response.status_code == 200
     body = response.json()
     assert body["token_type"] == "bearer"
-    secret_key = get_jwt_secret().secret_key
+    secret_key = Utils.get_jwt_secret().secret_key
     payload = jwt.decode(body["access_token" ], secret_key, algorithms=["HS256"])
     assert payload["sub"] == "admin"
     assert payload["scopes"] == []
@@ -40,7 +40,7 @@ def test_create_token():
 def test_create_token_incorrect_username():
     response = client.post(
         "/api/v1/token",
-        {"username": "unknown", "password": "admin1234"}
+        data={"username": "unknown", "password": "admin1234"}
     )
     assert response.status_code == 401
     body = response.json()
@@ -49,7 +49,7 @@ def test_create_token_incorrect_username():
 def test_create_token_incorrect_password():
     response = client.post(
         "/api/v1/token",
-        {"username": "admin", "password": "hogehoge"}
+        data={"username": "admin", "password": "hogehoge"}
     )
     assert response.status_code == 401
     body = response.json()

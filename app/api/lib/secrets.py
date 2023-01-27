@@ -4,7 +4,7 @@ import boto3
 from functools import lru_cache
 from pydantic import BaseModel
 
-from api.env import get_env
+from api.env import get_env, Environment, Mode
 from api.lib.logger import logger
 
 """
@@ -13,13 +13,10 @@ lru_cacheを利用することで、複数回アクセスしないようにな�
 """
 
 class RdsSecret(BaseModel):
-    password: str
-    dbname: str
-    engine: str
-    port: int
-    dbInstanceIdentifier: str
-    host: str
-    username: str
+    db_user: str
+    db_password: str
+    db_host: str
+    db_port: int
 
 
 class JwtSecret(BaseModel):
@@ -39,18 +36,28 @@ def get_secret(secret_name: str, aws_region: str) -> Dict[str, str]:
 
 
 @lru_cache
-def get_rds_secret(_ttl_hash: int = -1) -> RdsSecret:
+def get_rds_secret(_ttl_hash: int = -1, env: Environment = get_env()) -> RdsSecret:
     logger.info(f"get_rds_secret _ttl_hash: {_ttl_hash}")
-    env = get_env()
-    secret = get_secret(env.rds_secret_name, env.aws_region)
-    # logger.info(secret)
-    return RdsSecret.parse_obj(secret)
+    if env.mode is Mode.LOCAL:
+        return RdsSecret(
+            password="",
+            dbname="",
+            engine="",
+            port="",
+            dbInstanceIdentifier="",
+            host="",
+            username=""
+        )
+    else:
+        secret = get_secret(env.db_secret_name, env.aws_region)
+        return RdsSecret.parse_obj(secret)
 
 
 @lru_cache
-def get_jwt_secret(_ttl_hash: int = -1) -> JwtSecret:
+def get_jwt_secret(_ttl_hash: int = -1, env: Environment = get_env()) -> JwtSecret:
     logger.info(f"get_jwt_secret _ttl_hash: {_ttl_hash}")
-    env = get_env()
-    secret = get_secret(env.jwt_secret_name, env.aws_region)
-    # logger.info(secret)
-    return JwtSecret.parse_obj(secret)
+    if env.mode is Mode.LOCAL:
+        return JwtSecret(secret_key="abcdefg123456789")
+    else:
+        secret = get_secret(env.jwt_secret_name, env.aws_region)
+        return JwtSecret.parse_obj(secret)

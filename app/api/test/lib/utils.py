@@ -15,7 +15,7 @@ def get_token(
 ):
     response = client.post(
         "/api/v1/token",
-        {"username": username, "password": password}
+        data={"username": username, "password": password}
     )
     if response.status_code != 200:
         raise Exception(f"{response.status_code}: {response.content}")

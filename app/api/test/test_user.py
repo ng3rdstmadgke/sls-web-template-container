@@ -60,7 +60,7 @@ def test_read_success_getAll():
     token = test_utils.get_token(client)
     response = client.get(
         "/api/v1/users/",
-        json={"skip": 0, "limit": 10},
+        params={"skip": 0, "limit": 10},
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 200

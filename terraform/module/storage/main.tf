@@ -90,7 +90,7 @@ resource "aws_db_instance" "app_db" {
   db_subnet_group_name = aws_db_subnet_group.app_db_subnet_group.name
   backup_retention_period = 30
   enabled_cloudwatch_logs_exports = ["error", "general", "slowquery"]
-  multi_az = true
+  multi_az = false
   parameter_group_name = aws_db_parameter_group.app_db_pg.name
   port = 3306
   vpc_security_group_ids = [aws_security_group.app_db_sg.id]
