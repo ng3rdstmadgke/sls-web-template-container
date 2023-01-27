@@ -22,6 +22,7 @@ provider "aws" {
 
 variable "db_user" {}
 variable "db_password" {}
+variable "secret_key" {}
 
 output "db_host" {
   value = module.storage.db_host
@@ -36,6 +37,13 @@ locals {
   stage = "mi1"
   vpc_id = "vpc-0aa084a693ff324f4"
   subnets = ["subnet-015c06f1c967d4bfd", "subnet-0d43a2957b67e28bb"]
+}
+
+module "secret" {
+  source = "../../module/secret"
+  app_name = local.app_name
+  stage = local.stage
+  secret_key = var.secret_key
 }
 
 module "storage" {

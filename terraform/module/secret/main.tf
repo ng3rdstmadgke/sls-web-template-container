@@ -10,7 +10,7 @@ resource "aws_secretsmanager_secret" "jwt_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "hash_secret_version" {
-  secret_id = aws_secretsmanager_secret.hash_secret.id
+  secret_id = aws_secretsmanager_secret.jwt_secret.id
   secret_string = jsonencode({
     secret_key = var.secret_key
   })
