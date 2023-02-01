@@ -31,7 +31,7 @@ cat >&2 <<EOS
 
    # devコンテナ内でマイグレーション (deコンテナでの操作)
    $ ./bin/create-database.sh
-   $ alembic upgrade head
+   $ (cd api; alembic upgrade head)
    $ ./bin/manage.sh create_user admin --superuser
    $ exit
 

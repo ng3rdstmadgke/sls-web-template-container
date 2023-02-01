@@ -13,7 +13,7 @@ export default Vue.extend({
     alertType: {
       type: String,
       required: true,
-      validator (v) {
+      validator (v: string) {
         return [
           'info',
           'warning',
