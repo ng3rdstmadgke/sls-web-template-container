@@ -13,7 +13,7 @@ RUN printenv
 RUN yum update -y
 
 # install nodejs
-RUN curl -fsSL https://rpm.nodesource.com/setup_lts.x | bash -
+RUN curl -fsSL https://rpm.nodesource.com/setup_16.x | bash -
 RUN yum install -y nodejs
 
 # pip install
