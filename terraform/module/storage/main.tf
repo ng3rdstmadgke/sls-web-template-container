@@ -99,7 +99,7 @@ resource "aws_db_instance" "app_db" {
   vpc_security_group_ids = [aws_security_group.app_db_sg.id]
   storage_type = "gp3"
   network_type = "IPV4"
-  username = "admin"
+  username = var.db_user
   password = var.db_password
   final_snapshot_identifier = "${var.app_name}-${var.stage}-db"
   deletion_protection = true

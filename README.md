@@ -1,40 +1,18 @@
-# TODO
-
-- IaCの整備
-  - RDS
-  - Secrets Manager
-    - RDSの接続情報
-    - JWTの秘密鍵
-
-# インストール
-
-```bash
-# nvm install
-# https://github.com/nvm-sh/nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-
-# node.jsの最新のltsをインストール
-nvm install --lts
-nvm use --lts
-node -v
-npm -v
-
-# npm update
-npm update -g npm
-
-# serverless install
-cd sls-web-template
-npm install
-```
-
 # デプロイ
 
 ## terraformデプロイ
 ```bash
 STAGE_NAME=dev
 
-# terraformのプロジェクト作成
+# 新しいステージを作成
 cp -r terraform/stage/mi1 terraform/stage/$STAGE_NAME
+
+# ステージの設定を変更
+#   変更が必要な項目
+#   - terraform.backend.s3.bucket
+#   - terraform.backend.s3.key
+#   - locals配下の変数
+vim terraform/stage/$STAGE_NAME/main.tf
 
 # シークレットファイル作成
 cp terraform/stage/$STAGE_NAME/secrets.auto.tfvars.sample terraform/stage/$STAGE_NAME/secrets.auto.tfvars
@@ -42,17 +20,18 @@ cp terraform/stage/$STAGE_NAME/secrets.auto.tfvars.sample terraform/stage/$STAGE
 # シークレット情報の定義
 vim terraform/stage/$STAGE_NAME/secrets.auto.tfvars
 
-# エントリーポイントの設定を変更
-#   変更が必要な項目
-#   - terraform.backend.s3.bucket
-#   - terraform.backend.s3.key
-#   - locals配下の変数
-vim terraform/stage/$STAGE_NAME/main.tf
+# terraformプロジェクトの初期化
+./bin/terraform.sh --stage $STAGE_NAME -- init
 
-# 変更をコミット
+# 生成されるリソースの確認
+./bin/terraform.sh --stage $STAGE_NAME -- plan
 
 # terraformデプロイ
-./bin/terraform.sh -s $STAGE_NAME -- apply
+./bin/terraform.sh --stage $STAGE_NAME -- apply
+
+
+# デプロイに成功したら変更をコミット
+
 ```
 
 ## DBマイグレーション
@@ -87,7 +66,7 @@ exit
 
 ## slsデプロイ
 ```bash
-# ${APP_NAME}/lambda/ステージ名 で ECR リポジトリ作成
+# sls-web-template/lambda/ステージ名 で ECR リポジトリ作成
 
 # イメージのビルドとpush
 ./bin/push-image.sh -s $STAGE_NAME
